@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bevan:ital@0;1&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap"
+        rel="stylesheet">
+
+
+    <link rel="stylesheet" href="style.css">
+    <title>Untitled Word Game</title>
+</head>
+
+<body>
+    <h1>Untitled Word Game</h1>
+    <div id="main-container">
+        <div id="message-banner" class="hidden"></div>
+        <div id="word-guess-wrapper"></div>
+        <div id="column-wrapper">
+            <div id="game-board-wrapper">
+                <div id="game-board">
+                </div>
+                <div id="button-wrapper">
+                    <button id="undo-button">Undo</button>
+                    <button id="clear-button">Clear</button>
+                    <button id="submit-button">Submit</button>
+                </div>
+            </div>
+            <div id="scoreboard"></div>
+        </div>
+
+
+    </div>
+    <script src="game.js"></script>
+    <script src="words.js"></script>
+</body>
+
+</html>
