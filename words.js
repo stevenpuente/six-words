@@ -1,13 +1,22 @@
-// This is just a placeholder until we can add a real word list
-const VALID_WORDS_BY_LENGTH = {
-  3: ["CAT", "DOG", "SUN", "HAT"],
-  4: ["TREE", "BOOK", "NOTE", "REED", "TIME", "HALF"],
-  5: ["STONE", "HOUSE", "SPOON"],
-  6: ["BUTTER", "GARDEN"],
-  7: ["FISHING", "PLAYERS"],
-  8: ["NOTEBOOK", "BASEBALL"],
-  9: ["DEVELOPER", "ALLIGATOR"],
-  10: ["BACKPACKER", "CAMPFIRES"],
-  11: ["DISCOURAGED", "CONTAINMENT"],
-  12: ["HOUSEWARMING", "TRANSFORMING"]
-};
+let VALID_WORDS_BY_LENGTH = {};
+let WORDS_LOADED = false;
+
+async function loadWords() {
+  try {
+    const response = await fetch('valid_words_by_length.json');
+    if (!response.ok) throw new Error('Failed to load word list');
+
+    const wordData = await response.json();
+
+    // Convert all words to uppercase for consistent checks (optional)
+    for (const length in wordData) {
+      wordData[length] = wordData[length].map(word => word.toUpperCase());
+    }
+
+    VALID_WORDS_BY_LENGTH = wordData;
+    WORDS_LOADED = true;
+    console.log('Words loaded:', VALID_WORDS_BY_LENGTH);
+  } catch (error) {
+    console.error('Error loading words:', error);
+  }
+}
