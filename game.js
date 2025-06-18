@@ -73,42 +73,6 @@ function clearGuess() {
   }
 }
 
-function submitWord() {
-  const cards = Array.from(document.querySelectorAll('#word-guess-wrapper .card'));
-
-  if (cards.length === 0) return;
-
-  // Create a new row in the scoreboard
-  const scoreboardRow = document.createElement('div');
-  scoreboardRow.classList.add('scoreboard-word');
-
-  cards.forEach(card => {
-    // Remove from word-guess area
-    wordGuessWrapper.removeChild(card);
-
-    // Normalize the card for scoreboard style
-    card.style.position = 'static';
-    card.style.top = 'auto';
-    card.style.left = 'auto';
-    card.style.transform = 'none';
-    card.style.zIndex = 'auto';
-    card.style.margin = '0'; // optionally override margin
-    card.removeEventListener('click', handleTopCardClick); // make it unclickable
-
-    // Add to scoreboard row
-    scoreboardRow.appendChild(card);
-  });
-
-  // Add this word to the scoreboard
-  scoreboard.appendChild(scoreboardRow);
-
-  // Commit the move: remove the last N entries from moveHistory
-  for (let i = 0; i < cards.length; i++) {
-    moveHistory.pop();
-
-  }
-}
-
 function handleTopCardClick(e) {
   const topCard = e.currentTarget;
   const cell = topCard.parentElement;
@@ -266,11 +230,21 @@ function displayMessage(text, type = 'error', duration = 2500) {
 
 function submitWord() {
   const cards = Array.from(document.querySelectorAll('#word-guess-wrapper .card'));
-  const word = cards.map(card => card.innerText).join('').toUpperCase();
+  const word = cards.map(card => card.innerText).join('').trim().toUpperCase();
+
+  if (cards.length === 0) {
+    displayMessage("Select at least one letter.", 'error');
+    return;
+  }
+
+  if (!VALID_WORDS_BY_LENGTH) {
+    displayMessage("Word list not loaded. Please reload the page.", 'error');
+    return;
+  }
 
   // Length validation
-  if (word.length < 3 || word.length > 12) {
-    displayMessage("Word must be between 3 and 12 letters.", 'error');
+  if (word.length < 2 || word.length > 15) {
+    displayMessage("Word must be between 2 and 15 letters.", 'error');
     return;
   }
 
@@ -310,13 +284,27 @@ function submitWord() {
   scoreboard.appendChild(scoreboardRow);
 
   // Clear from move history (prevent undoing submitted words)
-  for (let i = 0; i < cards.length; i++) {
-    moveHistory.pop();
-  }
+  moveHistory.splice(-cards.length, cards.length);
 }
 
 // Run init on page load
-document.addEventListener('DOMContentLoaded', () => {
-  addCardsAndGrid();
-  initializeEventListeners();
+document.addEventListener('DOMContentLoaded', async () => {
+  submitButton.disabled = true;
+
+  try {
+    await loadWords();
+    console.log('Words loaded, game ready');
+
+    addCardsAndGrid();
+    initializeEventListeners();
+
+    submitButton.disabled = false;
+  } catch (error) {
+    displayMessage('Failed to load word list. Please reload.', 'error', 5000);
+    submitButton.disabled = true;
+    console.error(error);
+  }
+
+
+
 });
