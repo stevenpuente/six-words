@@ -292,11 +292,23 @@ document.addEventListener('DOMContentLoaded', async () => {
   submitButton.disabled = true;
 
   try {
-    await loadWords();
-    console.log('Words loaded, game ready');
+    // Wait for both word lists: validation + generation
+    await Promise.all([
+      loadWords(),
+      generateWords()
+    ]);
 
-    addCardsAndGrid();
-    initializeEventListeners();
+    // Generate a fresh board
+    const { board, wordsUsed } = generateRandomBoard();
+
+    // Replace the global `gameBoard` array with the generated one
+    gameBoard.length = 0;
+    gameBoard.push(...board); // board is 16 pairs like [['A','B'], ...]
+
+    console.log("Game board generated with words:", wordsUsed);
+
+    addCardsAndGrid();          // Actually adds cards to the DOM
+    initializeEventListeners(); // Adds listeners for clicks
 
     submitButton.disabled = false;
   } catch (error) {
@@ -304,7 +316,4 @@ document.addEventListener('DOMContentLoaded', async () => {
     submitButton.disabled = true;
     console.error(error);
   }
-
-
-
 });
