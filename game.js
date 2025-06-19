@@ -14,6 +14,7 @@ const gameBoardElement = document.querySelector('#game-board');
 // === INITIALIZATION === (this listener fires when dom content is loaded, effectively kicking off the game)
 document.addEventListener('DOMContentLoaded', async () => {
   submitButton.disabled = true;
+  undoButton.disabled = true;   //inactive until first word submitted
 
   try {
     // Wait for both word lists: validation + generation
@@ -83,7 +84,7 @@ function initializeEventListeners() {
   gameBoardElement.addEventListener('click', handleBoardClick);
 
   // add event listeners for clicking the undo, submit and clear buttons
-  undoButton.addEventListener('click', undoLastLetterPlaced);
+  undoButton.addEventListener('click', undoSubmittedWord);
   submitButton.addEventListener('click', submitWord);
   clearButton.addEventListener('click', clearGuess);
   wordGuessWrapper.addEventListener('click', handleWordGuessCardClick);
@@ -140,19 +141,19 @@ function moveCardToGuessArea(topCard) {
 }
 
 function handleWordGuessCardClick(e) {
-    const clickedCard = e.target.closest('.card');
-    if (!clickedCard || !wordGuessWrapper.contains(clickedCard)) return;
+  const clickedCard = e.target.closest('.card');
+  if (!clickedCard || !wordGuessWrapper.contains(clickedCard)) return;
 
-    const guessCards = Array.from(wordGuessWrapper.children);
-    const clickedIndex = guessCards.indexOf(clickedCard);
+  const guessCards = Array.from(wordGuessWrapper.children);
+  const clickedIndex = guessCards.indexOf(clickedCard);
 
-    if (clickedIndex === -1) return;
+  if (clickedIndex === -1) return;
 
-    // Undo all cards from the clicked one onward
-    const numToUndo = guessCards.length - clickedIndex;
-    for (let i = 0; i < numToUndo; i++) {
-      undoLastLetterPlaced();
-    }
+  // Undo all cards from the clicked one onward
+  const numToUndo = guessCards.length - clickedIndex;
+  for (let i = 0; i < numToUndo; i++) {
+    undoLastLetterPlaced();
+  }
 }
 
 
@@ -210,40 +211,96 @@ function submitWord() {
     return;
   }
 
-  // Length validation
   if (word.length < 2 || word.length > 15) {
     displayMessage("Word must be between 2 and 15 letters.", 'error');
     return;
   }
 
-  // Lookup valid words by length
   const validWords = window.VALID_WORDS_BY_LENGTH[word.length] || [];
-
   if (!validWords.includes(word)) {
     displayMessage(`"${word}" is not a valid word!`, 'error');
     return;
   }
 
-  // If valid, show a success message (optional)
-  displayMessage(`"${word}" submitted! Maybe Put Points Here!`, 'success');
+  displayMessage(`"${word}" submitted!`, 'success');
 
-  // Create a new row in the scoreboard
   const scoreboardRow = document.createElement('div');
   scoreboardRow.classList.add('scoreboard-word');
 
-  cards.forEach(card => {
-    // Remove from word-guess area
-    wordGuessWrapper.removeChild(card);
+  const currentWordMoves = []; // ⬅️ collect moves for this word
 
-    // Add to scoreboard row
+  cards.forEach(card => {
+    wordGuessWrapper.removeChild(card);
     scoreboardRow.appendChild(card);
   });
 
-  // Add word to scoreboard
   scoreboard.appendChild(scoreboardRow);
 
-  // Clear from move history (prevent undoing submitted words)
-  moveHistory.splice(-cards.length, cards.length);
+  // Pull this word's moves from moveHistory
+  for (let i = 0; i < cards.length; i++) {
+    currentWordMoves.unshift(moveHistory.pop());
+  }
+
+  // Track in a new per-word stack
+  submittedWordsHistory.push({
+    word,
+    cards,
+    moves: currentWordMoves,
+    scoreboardRow
+  });
+
+  // Enable Undo
+  undoButton.disabled = false;
+}
+
+function undoSubmittedWord() {
+  if (submittedWordsHistory.length === 0) return;
+
+  // Step 1: Clear any active in-progress guess
+  clearGuess();
+
+  // Step 2: Retrieve last submitted word info
+  const lastWord = submittedWordsHistory.pop();
+  if (!lastWord || !lastWord.moves || !lastWord.scoreboardRow) return;
+
+  // Remove word row from scoreboard
+  if (lastWord.scoreboardRow.parentElement) {
+    lastWord.scoreboardRow.parentElement.removeChild(lastWord.scoreboardRow);
+  }
+
+  // Step 3: Restore cards and move history
+  for (const move of lastWord.moves.reverse()) {
+    const { movedCard, movedCardOriginalParent, movedCardOriginalClasses } = move;
+
+    if (movedCard.parentElement) {
+      movedCard.parentElement.removeChild(movedCard);
+    }
+
+    movedCard.className = '';
+    movedCardOriginalClasses.forEach(cls => movedCard.classList.add(cls));
+    movedCardOriginalParent.appendChild(movedCard);
+
+    // Restore promoted card, if any
+    if (move.promotedCardInfo) {
+      const { card, originalClasses } = move.promotedCardInfo;
+
+      if (card.parentElement) {
+        card.parentElement.removeChild(card);
+      }
+
+      card.className = '';
+      originalClasses.forEach(cls => card.classList.add(cls));
+      move.cell.appendChild(card);
+    }
+
+    // Push move back into history in case we want to re-submit it
+    moveHistory.push(move);
+  }
+
+  // Step 4: Disable undo if no more submitted words
+  if (submittedWordsHistory.length === 0) {
+    undoButton.disabled = true;
+  }
 }
 
 function clearGuess() {
