@@ -257,7 +257,10 @@ function undoSubmittedWord() {
   if (submittedWordsHistory.length === 0) return;
 
   // Step 1: Clear any active in-progress guess
-  clearGuess();
+  if (document.querySelectorAll('#word-guess-wrapper .card').length !== 0) {
+    clearGuess();
+    return;
+  };
 
   // Step 2: Retrieve last submitted word info
   const lastWord = submittedWordsHistory.pop();
