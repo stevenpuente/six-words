@@ -1,5 +1,5 @@
-window.VALID_WORDS_BY_LENGTH = {};
-window.WORDS_LOADED = false;
+let VALID_WORDS_BY_LENGTH = {};
+let WORDS_LOADED = false;
 
 async function loadWords() {
   try {
@@ -13,9 +13,9 @@ async function loadWords() {
       wordData[length] = wordData[length].map(word => word.toUpperCase());
     }
 
-    window.VALID_WORDS_BY_LENGTH = wordData;
-    window.WORDS_LOADED = true;
-    console.log('Words loaded:', window.VALID_WORDS_BY_LENGTH);
+    VALID_WORDS_BY_LENGTH = wordData;
+    WORDS_LOADED = true;
+    console.log('Words loaded:', VALID_WORDS_BY_LENGTH);
   } catch (error) {
     console.error('Error loading words:', error);
   }
