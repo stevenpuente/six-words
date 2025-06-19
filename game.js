@@ -6,7 +6,7 @@ const submittedWordsHistory = [];
 const wordGuessWrapper = document.getElementById('word-guess-wrapper');
 const undoButton = document.getElementById('undo-button');
 const submitButton = document.getElementById('submit-button');
-const clearButton = document.getElementById('clear-button');
+const resetButton = document.getElementById('reset-button');
 const scoreboard = document.getElementById('scoreboard');
 const gameBoardElement = document.querySelector('#game-board');
 
@@ -83,10 +83,10 @@ function initializeEventListeners() {
   // add event listener to game board
   gameBoardElement.addEventListener('click', handleBoardClick);
 
-  // add event listeners for clicking the undo, submit and clear buttons
+  // add event listeners for clicking the undo, submit and reset buttons
   undoButton.addEventListener('click', undoSubmittedWord);
   submitButton.addEventListener('click', submitWord);
-  clearButton.addEventListener('click', clearGuess);
+  resetButton.addEventListener('click', resetPuzzle);
   wordGuessWrapper.addEventListener('click', handleWordGuessCardClick);
 }
 
@@ -309,6 +309,20 @@ function clearGuess() {
     undoLastLetterPlaced();
   }
 }
+
+function resetPuzzle() {
+  // First, clear any in-progress word
+  clearGuess();
+
+  // Then, keep undoing submitted words until none remain
+  while (submittedWordsHistory.length > 0) {
+    undoSubmittedWord();
+  }
+
+  // Also clear any messages, if desired
+  displayMessage("Puzzle reset.", 'success');
+}
+
 
 // === HELPER FUNCTIONS === 
 
