@@ -106,22 +106,10 @@ function handleTopCardClick(e) {
     movedCard: topCard,
     movedCardOriginalClasses: Array.from(topCard.classList),
     movedCardOriginalParent: topCard.parentElement,
-    movedCardOriginalStyles: {
-      top: topCard.style.top,
-      left: topCard.style.left,
-      transform: topCard.style.transform,
-      zIndex: topCard.style.zIndex,
-    }
   };
 
   // Remove topCard from cell and add to guess area
   cell.removeChild(topCard);
-  // Reset styles for guess area display
-  topCard.style.position = 'relative';
-  topCard.style.top = 'auto';
-  topCard.style.left = 'auto';
-  topCard.style.transform = 'none';
-  topCard.style.zIndex = 'auto';
 
   // Add it to guess area
   wordGuessWrapper.appendChild(topCard);
@@ -130,13 +118,7 @@ function handleTopCardClick(e) {
   if (bottomCard) {
     move.promotedCardInfo = {
       card: bottomCard,
-      originalClasses: Array.from(bottomCard.classList),
-      originalStyles: {
-        top: bottomCard.style.top,
-        left: bottomCard.style.left,
-        transform: bottomCard.style.transform,
-        zIndex: bottomCard.style.zIndex,
-      }
+      originalClasses: Array.from(bottomCard.classList)
     };
 
     // Remove bottomCard from cell to re-add as top card
@@ -145,12 +127,6 @@ function handleTopCardClick(e) {
     // Update classes
     bottomCard.classList.remove('bottom');
     bottomCard.classList.add('top');
-
-    // Reset styles for top card position
-    bottomCard.style.top = '50%';
-    bottomCard.style.left = '50%';
-    bottomCard.style.transform = 'translate(-50%, -50%)';
-    bottomCard.style.zIndex = '3';
 
     // Add click listener to new top card
     bottomCard.addEventListener('click', handleTopCardClick);
@@ -172,7 +148,6 @@ function undoLastMove() {
   const movedCard = lastMove.movedCard;
   const originalParent = lastMove.movedCardOriginalParent;
   const originalClasses = lastMove.movedCardOriginalClasses;
-  const originalStyles = lastMove.movedCardOriginalStyles;
 
   // Remove movedCard from guess area and put back in original cell
   if (movedCard.parentElement === wordGuessWrapper) {
@@ -180,15 +155,11 @@ function undoLastMove() {
   }
   originalParent.appendChild(movedCard);
 
-  // Restore classes & styles for movedCard
+  // Restore classes for movedCard
   movedCard.className = ''; // reset all classes
   originalClasses.forEach(cls => movedCard.classList.add(cls));
 
-  movedCard.style.position = 'absolute';
-  movedCard.style.top = originalStyles.top || '';
-  movedCard.style.left = originalStyles.left || '';
-  movedCard.style.transform = originalStyles.transform || '';
-  movedCard.style.zIndex = originalStyles.zIndex || '';
+
 
   // Add click listener back if top card
   if (movedCard.classList.contains('top')) {
@@ -199,22 +170,16 @@ function undoLastMove() {
 
   // Undo promotion if any
   if (lastMove.promotedCardInfo) {
-    const { card, originalClasses, originalStyles } = lastMove.promotedCardInfo;
+    const { card, originalClasses } = lastMove.promotedCardInfo;
 
     // Remove promoted card from cell
     if (card.parentElement) {
       card.parentElement.removeChild(card);
     }
 
-    // Restore classes & styles
+    // Restore classes 
     card.className = ''; // clear classes
     originalClasses.forEach(cls => card.classList.add(cls));
-
-    card.style.position = 'absolute';
-    card.style.top = originalStyles.top || '';
-    card.style.left = originalStyles.left || '';
-    card.style.transform = originalStyles.transform || '';
-    card.style.zIndex = originalStyles.zIndex || '';
 
     // Remove click listener if not top
     if (card.classList.contains('top')) {
@@ -237,7 +202,7 @@ function submitWord() {
     return;
   }
 
-  if (!VALID_WORDS_BY_LENGTH) {
+  if (!window.VALID_WORDS_BY_LENGTH) {
     displayMessage("Word list not loaded. Please reload the page.", 'error');
     return;
   }
@@ -249,7 +214,7 @@ function submitWord() {
   }
 
   // Lookup valid words by length
-  const validWords = VALID_WORDS_BY_LENGTH[word.length] || [];
+  const validWords = window.VALID_WORDS_BY_LENGTH[word.length] || [];
 
   if (!validWords.includes(word)) {
     displayMessage(`"${word}" is not a valid word!`, 'error');
@@ -267,13 +232,6 @@ function submitWord() {
     // Remove from word-guess area
     wordGuessWrapper.removeChild(card);
 
-    // Reset styles and remove click behavior
-    card.style.position = 'static';
-    card.style.top = 'auto';
-    card.style.left = 'auto';
-    card.style.transform = 'none';
-    card.style.zIndex = 'auto';
-    card.style.margin = '0';
     card.removeEventListener('click', handleTopCardClick);
 
     // Add to scoreboard row
@@ -314,7 +272,3 @@ function displayMessage(text, type = 'error', duration = 2500) {
     banner.classList.add('hidden');
   }, duration);
 }
-
-
-
-
