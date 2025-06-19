@@ -1,12 +1,5 @@
 // Constants
-const gameBoard = [
-  ['C', 'B'], ['E', 'T'], ['O', 'N'], ['S', 'I'],
-  ['E', 'L'], ['R', 'U'], ['D', 'E'], ['M', 'C'],
-  ['H', 'A'], ['Y', 'G'], ['F', 'K'], ['P', 'W'],
-  ['O', 'V'], ['L', 'T'], ['J', 'Z'], ['Q', 'N'],
-];
-
-
+const gameBoard = [];
 const moveHistory = [];
 
 const wordGuessWrapper = document.getElementById('word-guess-wrapper');
@@ -14,10 +7,40 @@ const undoButton = document.getElementById('undo-button');
 const submitButton = document.getElementById('submit-button');
 const clearButton = document.getElementById('clear-button');
 const scoreboard = document.getElementById('scoreboard');
+const gameBoardElement = document.querySelector('#game-board');
 
 
+// === INITIALIZATION === (this listener fires when dom content is loaded, effectively kicking off the game)
+document.addEventListener('DOMContentLoaded', async () => {
+  submitButton.disabled = true;
+
+  try {
+    // Wait for both word lists: validation + generation
+    await Promise.all([
+      loadWords(),
+      generateWords()
+    ]);
+
+    // Generate a fresh board
+    const { board, wordsUsed } = generateRandomBoard();
+
+    gameBoard.push(...board); // board is 16 pairs like [['A','B'], ...]
+    console.log("Game board generated with words:", wordsUsed);       // Remove this once satisfied with game quality
+
+    addCardsAndGrid();          // Adds cards to the DOM
+    initializeEventListeners(); // Adds listeners for clicks
+
+    submitButton.disabled = false;
+  } catch (error) {
+    displayMessage('Failed to load word list. Please reload.', 'error', 5000);
+    submitButton.disabled = true;
+    console.error(error);
+  }
+});
+
+// This is called within the initial domcontentloaded event listener and adds 16 cells and 32 cards to the gameboard programatically
 function addCardsAndGrid() {
-  const gameBoardElement = document.querySelector('#game-board');
+
   for (let i = 0; i < 16; i++) {
     const cell = document.createElement('div');
     cell.classList.add('cell');
@@ -52,28 +75,24 @@ function addCardsAndGrid() {
   }
 }
 
-
-// Initialize: attach click listeners to all top cards
+// This is called within the initial domcontentloaded event listner and then adds click listeners to all top cards that were generated in addcardsandgrid
 function initializeEventListeners() {
+  // select all top cards and add event listeners to each one.
   const topCards = document.querySelectorAll('.card.top');
-  topCards.forEach(card => {
-    card.addEventListener('click', handleTopCardClick);
-  });
+  for (let topCard of topCards) {
+    topCard.addEventListener('click', handleTopCardClick);
+  };
 
+  // add event listeners for clicking the undo, submit and clear buttons
   undoButton.addEventListener('click', undoLastMove);
   submitButton.addEventListener('click', submitWord);
   clearButton.addEventListener('click', clearGuess);
-
 }
 
-function clearGuess() {
-  // Keep undoing until there are no more cards in the guess area
-  while (wordGuessWrapper.firstChild) {
-    undoLastMove();
-  }
-}
+// === GAME MECHANICS === (event liseners for button presses)
 
 function handleTopCardClick(e) {
+  // e is the event object passed in from the event listener that fires when a top card is clicked
   const topCard = e.currentTarget;
   const cell = topCard.parentElement;
 
@@ -209,25 +228,6 @@ function undoLastMove() {
   }
 }
 
-function displayMessage(text, type = 'error', duration = 2500) {
-  const banner = document.getElementById('message-banner');
-  banner.textContent = text;
-  banner.className = ''; // reset
-  banner.classList.add(type === 'error' ? 'error' : 'success');
-  banner.classList.remove('hidden');
-
-  if (type === 'success') {
-    banner.style.backgroundColor = 'rgba(25, 135, 84, 0.85)'; // green
-  } else {
-    banner.style.backgroundColor = 'rgba(255, 0, 0, 0.85)'; // red
-  }
-
-  // Hide after duration
-  setTimeout(() => {
-    banner.classList.add('hidden');
-  }, duration);
-}
-
 function submitWord() {
   const cards = Array.from(document.querySelectorAll('#word-guess-wrapper .card'));
   const word = cards.map(card => card.innerText).join('').trim().toUpperCase();
@@ -287,33 +287,34 @@ function submitWord() {
   moveHistory.splice(-cards.length, cards.length);
 }
 
-// Run init on page load
-document.addEventListener('DOMContentLoaded', async () => {
-  submitButton.disabled = true;
-
-  try {
-    // Wait for both word lists: validation + generation
-    await Promise.all([
-      loadWords(),
-      generateWords()
-    ]);
-
-    // Generate a fresh board
-    const { board, wordsUsed } = generateRandomBoard();
-
-    // Replace the global `gameBoard` array with the generated one
-    gameBoard.length = 0;
-    gameBoard.push(...board); // board is 16 pairs like [['A','B'], ...]
-
-    console.log("Game board generated with words:", wordsUsed);
-
-    addCardsAndGrid();          // Actually adds cards to the DOM
-    initializeEventListeners(); // Adds listeners for clicks
-
-    submitButton.disabled = false;
-  } catch (error) {
-    displayMessage('Failed to load word list. Please reload.', 'error', 5000);
-    submitButton.disabled = true;
-    console.error(error);
+function clearGuess() {
+  // Keep undoing until there are no more cards in the guess area
+  while (wordGuessWrapper.firstChild) {
+    undoLastMove();
   }
-});
+}
+
+// === HELPER FUNCTIONS === 
+
+function displayMessage(text, type = 'error', duration = 2500) {
+  const banner = document.getElementById('message-banner');
+  banner.textContent = text;
+  banner.className = ''; // reset
+  banner.classList.add(type === 'error' ? 'error' : 'success');
+  banner.classList.remove('hidden');
+
+  if (type === 'success') {
+    banner.style.backgroundColor = 'rgba(25, 135, 84, 0.85)'; // green
+  } else {
+    banner.style.backgroundColor = 'rgba(255, 0, 0, 0.85)'; // red
+  }
+
+  // Hide after duration
+  setTimeout(() => {
+    banner.classList.add('hidden');
+  }, duration);
+}
+
+
+
+
