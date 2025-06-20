@@ -3,7 +3,7 @@
   --background-color-dark: #590d93;
   --background-color-light: #f5f5f5;
   --thin-cell-border-color: #b4b4b4;
-  --text-color-dark:#2c2c2c;
+  --text-color-dark: #2c2c2c;
   --text-color-light: #f5f5f5;
   --green-card-color: #198754;
   --blue-card-color: #0dcaf0;
@@ -14,7 +14,8 @@
   --submit-button-color: #2E5F28;
   --submit-button-color-hover: #254D20;
   --message-banner-error: rgba(255, 0, 0, 0.85);
-  --message-banner-success: rgba(25, 135, 84, 0.85);  /*<----- not working yet. i think this is styled in the javascript. need to move the style into classes instead of javascript logic*/
+  --message-banner-success: rgba(25, 135, 84, 0.85);
+  /*<----- not working yet. i think this is styled in the javascript. need to move the style into classes instead of javascript logic*/
 }
 
 
@@ -43,7 +44,16 @@ body {
 h1 {
   color: var(--text-color-light);
   font-family: 'Bevan', serif;
-  font-size: 3.6rem;
+  font-size: 3rem;
+}
+
+h1 span {
+  color: var(--text-color-light);
+  font-family: 'open sans', serif;
+  font-weight: 100;
+  font-size: 2rem;
+  display: block;
+  text-align: right;
 }
 
 #main-container {
@@ -80,16 +90,18 @@ h1 {
 }
 
 #word-guess-wrapper {
-  flex: 1;
   width: 100%;
   border-radius: .5rem;
   display: flex;
   flex-wrap: nowrap;
-  height: 4rem;
+  height: 6rem;
   align-items: center;
   justify-content: center;
   background-color: var(--background-color-light);
   padding: 1rem;
+  font-size: 0;
+  line-height: 0;
+  overflow: hidden;
 }
 
 #word-guess-wrapper .card {
@@ -107,7 +119,7 @@ h1 {
   width: 100%;
   border-radius: .5rem;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   justify-content: center;
   align-items: stretch;
 }
@@ -123,7 +135,6 @@ h1 {
   flex: 2;
   border-radius: .5rem;
   margin: 1rem;
-  margin-left: 0rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -262,4 +273,11 @@ h1 {
   transform: translate(-50%, -50%) scale(1.15);
   box-shadow: 0 2px 15px rgba(0, 0, 0, 0.5);
   z-index: 5;
+}
+
+
+@media (min-width: 768px) {
+  #column-wrapper {
+  flex-direction: row-reverse;
+}
 }
