@@ -106,6 +106,7 @@ function handleBoardClick(e) {
 }
 
 function moveCardToGuessArea(topCard) {
+  undoButton.disabled = false;
   const cell = topCard.parentElement;
   const bottomCard = cell.querySelector('.card.bottom');
 
@@ -131,8 +132,6 @@ function moveCardToGuessArea(topCard) {
     cell.removeChild(bottomCard);
     bottomCard.classList.remove('bottom');
     bottomCard.classList.add('top');
-
-    // No need to re-add event listener — we're using delegation now
 
     cell.appendChild(bottomCard);
   }
@@ -254,10 +253,11 @@ function submitWord() {
 }
 
 function undoSubmittedWord() {
-  if (submittedWordsHistory.length === 0) return;
+  const guessCards = document.querySelectorAll('#word-guess-wrapper .card');
+  if (submittedWordsHistory.length === 0 && guessCards.length === 0) return;
 
   // Step 1: Clear any active in-progress guess
-  if (document.querySelectorAll('#word-guess-wrapper .card').length !== 0) {
+  if (guessCards.length !== 0) {
     clearGuess();
     return;
   };
@@ -301,7 +301,7 @@ function undoSubmittedWord() {
   }
 
   // Step 4: Disable undo if no more submitted words
-  if (submittedWordsHistory.length === 0) {
+  if (submittedWordsHistory.length === 0 && guessCards.length === 0) {
     undoButton.disabled = true;
   }
 }
