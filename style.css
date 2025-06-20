@@ -73,7 +73,7 @@ h1 {
 }
 
 #word-guess-wrapper .card {
-  cursor:pointer;
+  cursor: pointer;
   margin: 0 0.4rem;
   width: 5rem;
   height: 5rem;
@@ -236,4 +236,10 @@ h1 {
 
 .card {
   transition: all 0.2s ease;
+}
+
+.cell .card.top.raised {
+  transform: translate(-50%, -50%) scale(1.15);
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.5);
+  z-index: 5;
 }

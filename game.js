@@ -3,12 +3,17 @@ const gameBoard = [];
 const moveHistory = [];
 const submittedWordsHistory = [];
 
+const keyboardCycleState = {
+  currentKey: null,
+  currentIndex: 0,
+};
+
 const wordGuessWrapper = document.getElementById('word-guess-wrapper');
 const undoButton = document.getElementById('undo-button');
 const submitButton = document.getElementById('submit-button');
 const resetButton = document.getElementById('reset-button');
 const scoreboard = document.getElementById('scoreboard');
-const gameBoardElement = document.querySelector('#game-board');
+const gameBoardElement = document.getElementById('game-board');
 
 
 // === INITIALIZATION === (this listener fires when dom content is loaded, effectively kicking off the game)
@@ -88,11 +93,89 @@ function initializeEventListeners() {
   submitButton.addEventListener('click', submitWord);
   resetButton.addEventListener('click', resetPuzzle);
   wordGuessWrapper.addEventListener('click', handleWordGuessCardClick);
+  document.addEventListener('keydown', handleKeyPress);
 }
 
+// === KEYBOARD MECHANICS === (event liseners for button presses)
+function handleKeyPress(e) {
+  console.log(e.key);
+
+  if (e.key === 'Backspace' || e.key === 'Delete') {
+    undoLastLetterPlaced()
+    return;
+  }
+
+  if ((e.key === 'Enter' || e.key === 'Return')) {
+    const currentRaised = document.querySelector('.raised');
+    if (!currentRaised) {
+      submitWord();
+      return;
+    } else {
+      moveCardToGuessArea(currentRaised);
+      return;
+    }
+  }
+
+  const key = e.key.toUpperCase();
+  let numOfThisKeyOnBoard = 0;
+  const currentTopCards = document.querySelectorAll('.cell .card.top');
+
+
+  // if the last time this ran was not caused by the same key, then reset the current index and current key
+  if (keyboardCycleState['currentKey'] !== key) {
+    keyboardCycleState['currentKey'] = key;
+    keyboardCycleState['currentIndex'] = 0;
+  }
+
+
+  for (let card of currentTopCards) {
+    const cardText = card.innerText.trim().toUpperCase();
+    card.classList.remove('raised');
+    if (cardText === key) {
+      numOfThisKeyOnBoard++;
+    }
+  }
+
+
+  let cardIndex = 0;
+  for (let card of currentTopCards) {
+    const cardText = card.innerText.trim().toUpperCase();
+
+    if (keyboardCycleState['currentKey'] !== cardText) {
+      continue;
+    }
+
+    if (
+      keyboardCycleState['currentKey'] === cardText &&
+      keyboardCycleState['currentIndex'] !== cardIndex
+    ) {
+      cardIndex++;
+      continue;
+    }
+
+    if (
+      keyboardCycleState['currentKey'] === cardText &&
+      keyboardCycleState['currentIndex'] === cardIndex &&
+      (keyboardCycleState['currentIndex'] + 1) % (numOfThisKeyOnBoard) === 0
+    ) {
+      card.classList.add('raised')
+      keyboardCycleState['currentIndex']++;
+      keyboardCycleState['currentIndex'] = 0
+      break;
+    }
+
+    if (
+      keyboardCycleState['currentKey'] === cardText &&
+      keyboardCycleState['currentIndex'] === cardIndex
+    ) {
+      card.classList.add('raised')
+      keyboardCycleState['currentIndex']++;
+      break;
+    }
+  }
+}
 
 // === GAME MECHANICS === (event liseners for button presses)
-
 function handleBoardClick(e) {
   const clickedCard = e.target.closest('.card.top');
 
@@ -106,6 +189,7 @@ function handleBoardClick(e) {
 }
 
 function moveCardToGuessArea(topCard) {
+  topCard.classList.remove('raised');
   undoButton.disabled = false;
   const cell = topCard.parentElement;
   const bottomCard = cell.querySelector('.card.bottom');
