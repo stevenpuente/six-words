@@ -5,7 +5,7 @@ const submittedWordsHistory = [];
 
 const keyboardCycleState = {
   currentKey: null,
-  currentIndex: 0,
+  cardCycleIndex: 0,
 };
 
 const wordGuessWrapper = document.getElementById('word-guess-wrapper');
@@ -101,78 +101,59 @@ function handleKeyPress(e) {
   console.log(e.key);
 
   if (e.key === 'Backspace' || e.key === 'Delete') {
-    undoLastLetterPlaced()
+    resetKeyboardCycleState();
+    undoLastLetterPlaced();
     return;
   }
 
-  if ((e.key === 'Enter' || e.key === 'Return')) {
+  if (e.key === 'Enter' || e.key === 'Return') {
     const currentRaised = document.querySelector('.raised');
-    if (!currentRaised) {
-      submitWord();
-      return;
-    } else {
+    resetKeyboardCycleState();
+
+    if (currentRaised) {
       moveCardToGuessArea(currentRaised);
-      return;
+    } else {
+      submitWord();
     }
+    return;
   }
 
   const key = e.key.toUpperCase();
-  let numOfThisKeyOnBoard = 0;
   const currentTopCards = document.querySelectorAll('.cell .card.top');
 
+  // Filter to only cards that match the key
+  const matchingCards = Array.from(currentTopCards).filter(card =>
+    card.innerText.trim().toUpperCase() === key
+  );
 
-  // if the last time this ran was not caused by the same key, then reset the current index and current key
-  if (keyboardCycleState['currentKey'] !== key) {
-    keyboardCycleState['currentKey'] = key;
-    keyboardCycleState['currentIndex'] = 0;
+  // Reset index if the key has changed
+  if (keyboardCycleState.currentKey !== key) {
+    keyboardCycleState.currentKey = key;
+    keyboardCycleState.currentIndex = 0;
   }
 
+  // Remove any currently raised cards
+  currentTopCards.forEach(card => card.classList.remove('raised'));
 
-  for (let card of currentTopCards) {
-    const cardText = card.innerText.trim().toUpperCase();
-    card.classList.remove('raised');
-    if (cardText === key) {
-      numOfThisKeyOnBoard++;
-    }
-  }
+  if (matchingCards.length === 0) return; // no matches found
+
+  // Cycle to the next matching card
+  const index = keyboardCycleState.currentIndex % matchingCards.length;
+  matchingCards[index].classList.add('raised');
+  keyboardCycleState.currentIndex++;
+}
 
 
-  let cardIndex = 0;
-  for (let card of currentTopCards) {
-    const cardText = card.innerText.trim().toUpperCase();
 
-    if (keyboardCycleState['currentKey'] !== cardText) {
-      continue;
-    }
 
-    if (
-      keyboardCycleState['currentKey'] === cardText &&
-      keyboardCycleState['currentIndex'] !== cardIndex
-    ) {
-      cardIndex++;
-      continue;
-    }
 
-    if (
-      keyboardCycleState['currentKey'] === cardText &&
-      keyboardCycleState['currentIndex'] === cardIndex &&
-      (keyboardCycleState['currentIndex'] + 1) % (numOfThisKeyOnBoard) === 0
-    ) {
-      card.classList.add('raised')
-      keyboardCycleState['currentIndex']++;
-      keyboardCycleState['currentIndex'] = 0
-      break;
-    }
 
-    if (
-      keyboardCycleState['currentKey'] === cardText &&
-      keyboardCycleState['currentIndex'] === cardIndex
-    ) {
-      card.classList.add('raised')
-      keyboardCycleState['currentIndex']++;
-      break;
-    }
-  }
+
+
+
+function resetKeyboardCycleState() {
+  keyboardCycleState['currentKey'] = null;
+  keyboardCycleState['cardCycleIndex'] = 0;
 }
 
 // === GAME MECHANICS === (event liseners for button presses)
@@ -301,11 +282,29 @@ function submitWord() {
 
   const validWords = window.VALID_WORDS_BY_LENGTH[word.length] || [];
   if (!validWords.includes(word)) {
-    displayMessage(`"${word}" is not a valid word!`, 'error');
+    displayMessage(`"${word}" is not in the word list!`, 'error');
     return;
   }
 
-  displayMessage(`"${word}" submitted!`, 'success');
+  if (word.length === 3) {
+    displayMessage(`"${word}" Good!`, 'success');
+  } else if (word.length === 4) {
+    displayMessage(`"${word}" Nice!`, 'success');
+  } else if (word.length === 5) {
+    displayMessage(`"${word}" Awesome!`, 'success');
+  } else if (word.length >= 6 && word.length <= 7) {
+    displayMessage(`"${word}" Incredible!`, 'success');
+  } else if (word.length >= 8 && word.length <= 13) {
+    displayMessage(`"${word}" Amazing!`, 'success');
+  } else if (word.length >= 12 && word.length <= 14) {
+    displayMessage(`"${word}" Fantastic!`, 'success');
+  } else if (word.length === 15) {
+    displayMessage(`"${word}" Superb!`, 'success');
+  } else {
+    displayMessage(`"${word}" submitted!`, 'success');
+  }
+
+
 
   const scoreboardRow = document.createElement('div');
   scoreboardRow.classList.add('scoreboard-word');

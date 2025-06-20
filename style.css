@@ -1,3 +1,23 @@
+:root {
+  /* color variables */
+  --background-color-dark: #590d93;
+  --background-color-light: #f5f5f5;
+  --thin-cell-border-color: #b4b4b4;
+  --text-color-dark:#2c2c2c;
+  --text-color-light: #f5f5f5;
+  --green-card-color: #198754;
+  --blue-card-color: #0dcaf0;
+  --undo-button-color: #E17C3A;
+  --undo-button-color-hover: #D16A28;
+  --reset-button-color: #C55A5A;
+  --reset-button-color-hover: #B34848;
+  --submit-button-color: #2E5F28;
+  --submit-button-color-hover: #254D20;
+  --message-banner-error: rgba(255, 0, 0, 0.85);
+  --message-banner-success: rgba(25, 135, 84, 0.85);  /*<----- not working yet. i think this is styled in the javascript. need to move the style into classes instead of javascript logic*/
+}
+
+
 *,
 *::after,
 *::before {
@@ -8,9 +28,10 @@ html {
   font-size: 62.5%;
 }
 
+
 body {
-  background-color: #590d93;
-  color: rgb(44, 44, 44);
+  background-color: var(--background-color-dark);
+  color: var(--text-color-dark);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -20,19 +41,18 @@ body {
 }
 
 h1 {
-  color: #f5f5f5;
+  color: var(--text-color-light);
   font-family: 'Bevan', serif;
   font-size: 3.6rem;
 }
 
 #main-container {
-  color: #590d93;
   display: flex;
   box-sizing: border-box;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background-color: whitesmoke;
+  background-color: var(--background-color-light);
   font-family: 'Bevan', serif;
   border-radius: .5rem;
   width: max(100%, 25rem);
@@ -49,9 +69,9 @@ h1 {
   font-size: 1.6rem;
   font-weight: bold;
   border-radius: 0.5rem;
-  background-color: rgba(255, 0, 0, 0.85);
+  background-color: var(--message-banner-error);
   /* red by default */
-  color: white;
+  color: var(--text-color-light);
   transition: opacity 0.3s ease;
 }
 
@@ -68,7 +88,7 @@ h1 {
   height: 4rem;
   align-items: center;
   justify-content: center;
-  background-color: #efefef;
+  background-color: var(--background-color-light);
   padding: 1rem;
 }
 
@@ -93,7 +113,7 @@ h1 {
 }
 
 #scoreboard {
-  background-color: #efefef;
+  background-color: var(--background-color-light);
   flex: 1.25;
   border-radius: .5rem;
   margin: 1rem;
@@ -120,9 +140,9 @@ h1 {
 }
 
 .cell {
-  border: .5px solid rgb(180, 180, 180);
+  border: .5px solid var(--thin-cell-border-color);
   position: relative;
-  background: #fff;
+  background: var(--background-color-light);
   border-radius: 0.5rem;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   min-height: 100px;
@@ -136,7 +156,7 @@ h1 {
   width: 60px;
   height: 60px;
   border-radius: 0.5rem;
-  color: whitesmoke;
+  color: var(--text-color-light);
   font-family: 'open sans', serif;
   font-size: 2rem;
   display: flex;
@@ -163,7 +183,7 @@ h1 {
 }
 
 .card.green {
-  background-color: #198754;
+  background-color: var(--green-card-color);
 }
 
 .cell .card.top:hover {
@@ -180,7 +200,7 @@ h1 {
 }
 
 .card.blue {
-  background-color: #0dcaf0;
+  background-color: var(--blue-card-color);
 
 }
 
@@ -226,7 +246,7 @@ h1 {
   font-size: 1.5rem;
   position: static !important;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
-  color: white;
+  color: var(--text-color-light);
   border-radius: 0.5rem;
   display: flex;
   align-items: center;
