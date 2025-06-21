@@ -5,7 +5,7 @@ const submittedWordsHistory = [];
 
 const keyboardCycleState = {
   currentKey: null,
-  cardCycleIndex: 0,
+  currentIndex: 0,
 };
 
 const wordGuessWrapper = document.getElementById('word-guess-wrapper');
@@ -144,16 +144,9 @@ function handleKeyPress(e) {
 }
 
 
-
-
-
-
-
-
-
 function resetKeyboardCycleState() {
-  keyboardCycleState['currentKey'] = null;
-  keyboardCycleState['cardCycleIndex'] = 0;
+  keyboardCycleState.currentKey = null;
+  keyboardCycleState.currentIndex = 0;
 }
 
 // === GAME MECHANICS === (event liseners for button presses)
@@ -283,6 +276,8 @@ function submitWord() {
   const validWords = window.VALID_WORDS_BY_LENGTH[word.length] || [];
   if (!validWords.includes(word)) {
     displayMessage(`"${word}" is not in the word list!`, 'error');
+    // if the word is incorrect, remove from the word guess area
+    clearGuess();
     return;
   }
 
@@ -294,9 +289,9 @@ function submitWord() {
     displayMessage(`"${word}" Awesome!`, 'success');
   } else if (word.length >= 6 && word.length <= 7) {
     displayMessage(`"${word}" Incredible!`, 'success');
-  } else if (word.length >= 8 && word.length <= 13) {
+  } else if (word.length >= 8 && word.length <= 12) {
     displayMessage(`"${word}" Amazing!`, 'success');
-  } else if (word.length >= 12 && word.length <= 14) {
+  } else if (word.length >= 13 && word.length <= 14) {
     displayMessage(`"${word}" Fantastic!`, 'success');
   } else if (word.length === 15) {
     displayMessage(`"${word}" Superb!`, 'success');
@@ -420,9 +415,9 @@ function displayMessage(text, type = 'error', duration = 2500) {
   banner.classList.remove('hidden');
 
   if (type === 'success') {
-    banner.style.backgroundColor = 'rgba(25, 135, 84, 0.85)'; // green
+    banner.classList.add('success') // green
   } else {
-    banner.style.backgroundColor = 'rgba(255, 0, 0, 0.85)'; // red
+    banner.classList.add('error'); // red
   }
 
   // Hide after duration
