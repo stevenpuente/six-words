@@ -71,12 +71,12 @@ h1 span {
   width: max(100%, 25rem);
   max-width: 900px;
   min-height: max(70vh, 40rem);
-  padding: 2rem;
+  padding: 1rem;
 }
 
 #message-banner {
   z-index: 5;
-  top: 3rem;
+  top: 2rem;
   position: absolute;
   width: 100%;
   padding: 1rem;

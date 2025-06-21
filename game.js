@@ -299,12 +299,8 @@ function submitWord() {
     displayMessage(`"${word}" submitted!`, 'success');
   }
 
-
-
   const scoreboardRow = document.createElement('div');
   scoreboardRow.classList.add('scoreboard-word');
-
-  const currentWordMoves = []; // ⬅️ collect moves for this word
 
   cards.forEach(card => {
     wordGuessWrapper.removeChild(card);
@@ -314,9 +310,7 @@ function submitWord() {
   scoreboard.appendChild(scoreboardRow);
 
   // Pull this word's moves from moveHistory
-  for (let i = 0; i < cards.length; i++) {
-    currentWordMoves.unshift(moveHistory.pop());
-  }
+  const currentWordMoves = moveHistory.splice(-cards.length, cards.length)
 
   // Track in a new per-word stack
   submittedWordsHistory.push({
@@ -334,9 +328,9 @@ function undoSubmittedWord() {
   const guessCards = document.querySelectorAll('#word-guess-wrapper .card');
   if (submittedWordsHistory.length === 0 && guessCards.length === 0) return;
 
-  // Step 1: Clear any active in-progress guess
+  // Step 1: if there are guess cards, remove last card
   if (guessCards.length !== 0) {
-    clearGuess();
+    undoLastLetterPlaced();
     return;
   };
 
@@ -349,7 +343,7 @@ function undoSubmittedWord() {
     lastWord.scoreboardRow.parentElement.removeChild(lastWord.scoreboardRow);
   }
 
-  // Step 3: Restore cards and move history
+  // Step 3: Restore cards
   for (const move of lastWord.moves.reverse()) {
     const { movedCard, movedCardOriginalParent, movedCardOriginalClasses } = move;
 
@@ -373,9 +367,6 @@ function undoSubmittedWord() {
       originalClasses.forEach(cls => card.classList.add(cls));
       move.cell.appendChild(card);
     }
-
-    // Push move back into history in case we want to re-submit it
-    moveHistory.push(move);
   }
 
   // Step 4: Disable undo if no more submitted words
