@@ -13,14 +13,38 @@
   --reset-button-color-hover: #B34848;
   --submit-button-color: #2E5F28;
   --submit-button-color-hover: #254D20;
-  --message-banner-error: rgba(255, 0, 0, 0.85);
-  --message-banner-success: rgba(25, 135, 84, 0.85);
+  --message-banner-error-color: rgba(255, 0, 0, 0.85);
+  --message-banner-success-color: rgba(25, 135, 84, 0.85);
   --undo-button-color: #E17C3A;
   --undo-button-color-hover: #D16A28;
   --reset-button-color: #C55A5A;
   --reset-button-color-hover: #B34848;
   --submit-button-color: #2E5F28;
   --submit-button-color-hover: #254D20;
+
+  /* fonts */
+  --sans-serif-font-family: 'open sans', sans-serif;
+  --serif-font-family: 'Bevan', serif;
+
+  /* font sizes (I'm using rems. with the html root font size 62.5%, 1rem usually = 10px)*/
+  --game-title-font-size: 2.75rem;
+  --date-font-size: 1.75rem;
+  --message-banner-font-size: 1.6rem;
+  --word-guess-wrapper-card-font-size: 1.3rem;
+  --button-font-size: 1.5rem;
+
+  /* default card font is set here, but actual font is proportional with ems */
+  --default-card-font-size: 2rem;
+  --bottom-card-font-size: 1em;
+  --card-font-size: 1.75em;
+  --scoreboard-word-card-font-size: 1rem;
+
+  /* spacing variables */
+  --gap-for-game-board-and-word-guess: .3rem;
+  --gap-for-scoreboard-letters: .25rem;
+
+  /* rounded corner variables */
+  --default-border-radius: .5rem;
 }
 
 *,
@@ -40,22 +64,22 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-family: 'open sans', sans-serif;
+  font-family: var(--sans-serif-font-family);
 }
 
 h1 {
   margin: 0;
   margin-bottom: 1rem;
   color: var(--text-color-light);
-  font-family: 'Bevan', serif;
-  font-size: 2.75rem;
+  font-family: var(--serif-font-family);
+  font-size: var(--game-title-font-size);
 }
 
 h1 span {
   color: var(--text-color-light);
   font-family: 'open sans', serif;
   font-weight: 100;
-  font-size: 1.75rem;
+  font-size: var(--date-font-size);
   display: block;
   text-align: right;
 }
@@ -68,10 +92,10 @@ h1 span {
   align-items: center;
   justify-content: flex-start;
   background-color: var(--background-color-light);
-  font-family: 'Bevan', serif;
-  border-radius: .5rem;
+  font-family: var(--serif-font-family);
+  border-radius: var(--default-border-radius);
   width: max(100%, 25rem);
-  max-width: 900px;
+  max-width: 40rem;
   padding: 1rem;
   height: 63rem;
 }
@@ -84,10 +108,10 @@ h1 span {
   width: 100%;
   padding: 1rem;
   text-align: center;
-  font-size: 1.6rem;
+  font-size: var(--message-banner-font-size);
   font-weight: bold;
-  border-radius: 0.5rem;
-  background-color: var(--message-banner-error);
+  border-radius: var(--default-border-radius);
+  background-color: var(--message-banner-error-color);
   /* red by default */
   color: var(--text-color-light);
   transition: opacity 0.3s ease;
@@ -98,19 +122,19 @@ h1 span {
 }
 
 #message-banner.success {
-  background-color: var(--message-banner-success);
+  background-color: var(--message-banner-success-color);
 }
 
 #message-banner.error {
-  background-color: var(--message-banner-error);
+  background-color: var(--message-banner-error-color);
 }
 
 #word-guess-wrapper {
   margin: 1rem 0;
   width: 100%;
-  border-radius: .5rem;
+  border-radius: var(--default-border-radius);
   display: flex;
-  gap: .4rem;
+  gap: var(--gap-for-game-board-and-word-guess);
   flex-wrap: nowrap;
   height: 4rem;
   align-items: center;
@@ -126,14 +150,14 @@ h1 span {
   cursor: pointer;
   width: 4rem;
   height: 4rem;
-  font-size: 1.3rem;
+  font-size: var(--word-guess-wrapper-card-font-size);
 }
 
 
 
 #column-wrapper {
   width: 100%;
-  border-radius: .5rem;
+  border-radius: var(--default-border-radius);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -152,12 +176,12 @@ h1 span {
 #game-board {
   height: 100%;
   width: 100%;
-  max-width: 30rem;
-  max-height: 30rem;
+  max-width: 32rem;
+  max-height: 32rem;
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr;
   grid-template-rows: 1fr 1fr 1fr 1fr;
-  gap: .2rem;
+  gap: var(--gap-for-game-board-and-word-guess);
 }
 
 .cell {
@@ -167,7 +191,7 @@ h1 span {
   border: .5px solid var(--thin-cell-border-color);
   position: relative;
   background: var(--background-color-light);
-  /* border-radius: 0.5rem; */
+  /* border-radius: var(--default-border-radius); */
   min-height: 3rem;
   max-height: 8rem;
   min-width: 3rem;
@@ -179,10 +203,10 @@ h1 span {
 .card {
   width: 5rem;
   height: 5rem;
-  border-radius: 0.5rem;
+  border-radius: var(--default-border-radius);
   color: var(--text-color-light);
   font-family: 'open sans', serif;
-  font-size: 2rem;
+  font-size: var(--default-card-font-size);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -229,7 +253,7 @@ h1 span {
   display: block;
   top: 0%;
   left: 0%;
-  font-size: 1em;
+  font-size: var(--bottom-card-font-size);
   margin-left: .125rem;
 }
 
@@ -255,7 +279,7 @@ h1 span {
 
 .card span {
   line-height: 1;
-  font-size: 1.75em;
+  font-size: var(--card-font-size);
 }
 
 #button-wrapper {
@@ -267,6 +291,8 @@ h1 span {
 }
 
 #button-wrapper button {
+  font-size: var(--button-font-size);
+  border: 0;
   flex: 1;
   margin: 0 0.5rem;
   width: 20%;
@@ -304,9 +330,9 @@ h1 span {
 #scoreboard {
   display: flex;
   flex-direction: column;
-  gap: .25rem;
+  gap: var(--gap-for-scoreboard-letters);
   background-color: var(--background-color-light);
-  border-radius: .5rem;
+  border-radius: var(--default-border-radius);
   margin: 0rem;
   height: 13.25rem;
 }
@@ -314,7 +340,7 @@ h1 span {
 
 .scoreboard-word {
   display: flex;
-  gap: 0.25rem;
+  gap: var(--gap-for-scoreboard-letters);
   flex-wrap: nowrap;
   justify-content: center;
 }
@@ -322,11 +348,11 @@ h1 span {
 .scoreboard-word .card {
   width: 2rem;
   height: 2rem;
-  font-size: 1rem;
+  font-size: var(--scoreboard-word-card-font-size);
   position: static !important;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15); */
   color: var(--text-color-light);
-  border-radius: 0.5rem;
+  border-radius: var(--default-border-radius);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -339,12 +365,35 @@ h1 span {
 
 .cell .card.top.raised {
   transform: translate(-35%, -35%) scale(1.175);
-  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.5);
+  /* box-shadow: 0 2px 15px rgba(0, 0, 0, 0.5); */
   z-index: 5;
 }
 
 .cell .card.solo.raised {
   transform: translate(-50%, -50%) scale(1.175);
-  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.5);
+  /* box-shadow: 0 2px 15px rgba(0, 0, 0, 0.5); */
   z-index: 5;
 }
+
+
+@media (pointer: coarse) {
+  .button, .card {
+    touch-action: manipulation;
+    user-select: none;
+  }
+  
+}
+
+
+
+/* placeholder for medium devices (768-991px) */
+/* @media (min-width: 768px) {
+  #main-container {
+  max-width: 90rem;
+}
+} */
+
+/* placeholder for large devices (992+px) */
+/* @media (min-width: 992px) {
+} */
+
