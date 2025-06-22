@@ -90,11 +90,19 @@ function initializeEventListeners() {
   gameBoardElement.addEventListener('click', handleBoardClick);
 
   // add event listeners for clicking the undo, submit and reset buttons
-  undoButton.addEventListener('click', undoSubmittedWord);
-  submitButton.addEventListener('click', submitWord);
-  resetButton.addEventListener('click', resetPuzzle);
+  addBlurredClickListener(undoButton, undoSubmittedWord);
+  addBlurredClickListener(submitButton, submitWord);
+  addBlurredClickListener(resetButton, resetPuzzle);
   wordGuessWrapper.addEventListener('click', handleWordGuessCardClick);
   document.addEventListener('keydown', handleKeyPress);
+}
+
+// helper function to remove focus after button click:
+function addBlurredClickListener (element, handler) {
+  element.addEventListener('click', (e) => {
+    e.currentTarget.blur();
+    handler(e);
+  });
 }
 
 // === KEYBOARD MECHANICS === (event liseners for button presses)
@@ -120,7 +128,7 @@ function handleKeyPress(e) {
   }
 
   const key = e.key.toUpperCase();
-  const currentTopCards = document.querySelectorAll('.cell .card.top');
+  const currentTopCards = document.querySelectorAll('.cell .card.top, .cell .card.solo');
 
   // Filter to only cards that match the key
   const matchingCards = Array.from(currentTopCards).filter(card =>
@@ -152,7 +160,7 @@ function resetKeyboardCycleState() {
 
 // === GAME MECHANICS === (event liseners for button presses)
 function handleBoardClick(e) {
-  const clickedCard = e.target.closest('.card.top');
+  const clickedCard = e.target.closest('.card.top, .card.solo');
 
   // Ignore clicks outside cards or not on the board
   if (!clickedCard || !gameBoardElement.contains(clickedCard)) return;
@@ -190,7 +198,7 @@ function moveCardToGuessArea(topCard) {
 
     cell.removeChild(bottomCard);
     bottomCard.classList.remove('bottom');
-    bottomCard.classList.add('top');
+    bottomCard.classList.add('solo');
 
     cell.appendChild(bottomCard);
   }
