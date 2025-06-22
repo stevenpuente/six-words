@@ -8,6 +8,7 @@ const keyboardCycleState = {
   currentIndex: 0,
 };
 
+// DOM Elements
 const wordGuessWrapper = document.getElementById('word-guess-wrapper');
 const undoButton = document.getElementById('undo-button');
 const submitButton = document.getElementById('submit-button');
@@ -102,7 +103,7 @@ function handleKeyPress(e) {
 
   if (e.key === 'Backspace' || e.key === 'Delete') {
     resetKeyboardCycleState();
-    undoLastLetterPlaced();
+    undoSubmittedWord();
     return;
   }
 
