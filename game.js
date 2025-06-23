@@ -2,6 +2,7 @@
 const gameBoard = [];
 const moveHistory = [];
 const submittedWordsHistory = [];
+let score = 0;
 
 const keyboardCycleState = {
   currentKey: null,
@@ -98,7 +99,7 @@ function initializeEventListeners() {
 }
 
 // helper function to remove focus after button click:
-function addBlurredClickListener (element, handler) {
+function addBlurredClickListener(element, handler) {
   element.addEventListener('click', (e) => {
     e.currentTarget.blur();
     handler(e);
@@ -331,6 +332,9 @@ function submitWord() {
 
   // Enable Undo
   undoButton.disabled = false;
+
+  // update scoreboard
+  updateScoreAndWordSubmissionCount();
 }
 
 function undoSubmittedWord() {
@@ -382,6 +386,10 @@ function undoSubmittedWord() {
   if (submittedWordsHistory.length === 0 && guessCards.length === 0) {
     undoButton.disabled = true;
   }
+
+  // Step 5 Update Scoreboard
+  updateScoreAndWordSubmissionCount();
+
 }
 
 function clearGuess() {
@@ -424,4 +432,21 @@ function displayMessage(text, type = 'error', duration = 2500) {
   setTimeout(() => {
     banner.classList.add('hidden');
   }, duration);
+}
+
+// === UPDATE SCOREBOARD FUNCTIONS
+
+function calculateScore() {
+  const score = submittedWordsHistory.reduce((sum, word) => sum + word.cards.length, 0);
+  return score;
+}
+
+function updateScoreAndWordSubmissionCount() {
+  const scoreCounter = document.getElementById('score-counter-nums');
+  const wordSubmissionCounter = document.getElementById('words-submitted-counter-nums');
+  const wordSubmissionCount = submittedWordsHistory.length;
+  const score = calculateScore();
+
+  scoreCounter.textContent = score;
+  wordSubmissionCounter.textContent = `${wordSubmissionCount}/6`
 }

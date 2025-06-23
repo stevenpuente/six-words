@@ -97,7 +97,6 @@ h1 span {
   width: max(100%, 25rem);
   max-width: 40rem;
   padding: 1rem;
-  height: 63rem;
 }
 
 #message-banner {
@@ -283,7 +282,7 @@ h1 span {
 }
 
 #button-wrapper {
-  padding: 2rem 0 2.25rem 0;
+  padding: 2rem 0;
   display: flex;
   justify-content: center;
   width: 100%;
@@ -331,10 +330,10 @@ h1 span {
   display: flex;
   flex-direction: column;
   gap: var(--gap-for-scoreboard-letters);
-  background-color: var(--background-color-light);
+  /* background-color: var(--background-color-light); */
   border-radius: var(--default-border-radius);
-  margin: 0rem;
-  height: 13.25rem;
+  margin-top: -1.5rem;
+  height: 11rem;
 }
 
 
@@ -375,6 +374,32 @@ h1 span {
   z-index: 5;
 }
 
+#scoreboard-counters{
+  margin: 0 .5rem;
+}
+
+#scoreboard-counters-text{
+  margin: 0;
+  margin-bottom: 0rem;
+  padding: 0;
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--sans-serif-font-family);
+  font-size: 1.5rem;
+  line-height: 1;
+  font-weight: 100;
+}
+
+#scoreboard-counters-nums{
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--sans-serif-font-family);
+  font-size: 3rem;
+  line-height: 1;
+  font-weight: 100;
+}
 
 @media (pointer: coarse) {
   .button, .card {
