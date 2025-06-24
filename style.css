@@ -152,8 +152,6 @@ h1 span {
   font-size: var(--word-guess-wrapper-card-font-size);
 }
 
-
-
 #column-wrapper {
   width: 100%;
   border-radius: var(--default-border-radius);
@@ -336,7 +334,6 @@ h1 span {
   height: 11rem;
 }
 
-
 .scoreboard-word {
   display: flex;
   gap: var(--gap-for-scoreboard-letters);
@@ -401,6 +398,10 @@ h1 span {
   font-weight: 100;
 }
 
+
+
+
+
 @media (pointer: coarse) {
   .button, .card {
     touch-action: manipulation;
@@ -408,8 +409,6 @@ h1 span {
   }
   
 }
-
-
 
 /* placeholder for medium devices (768-991px) */
 /* @media (min-width: 768px) {

@@ -9,6 +9,7 @@ const keyboardCycleState = {
   currentIndex: 0,
 };
 
+
 // DOM Elements
 const wordGuessWrapper = document.getElementById('word-guess-wrapper');
 const undoButton = document.getElementById('undo-button');
@@ -98,18 +99,8 @@ function initializeEventListeners() {
   document.addEventListener('keydown', handleKeyPress);
 }
 
-// helper function to remove focus after button click:
-function addBlurredClickListener(element, handler) {
-  element.addEventListener('click', (e) => {
-    e.currentTarget.blur();
-    handler(e);
-  });
-}
-
 // === KEYBOARD MECHANICS === (event liseners for button presses)
 function handleKeyPress(e) {
-  console.log(e.key);
-
   if (e.key === 'Backspace' || e.key === 'Delete') {
     resetKeyboardCycleState();
     undoSubmittedWord();
@@ -153,11 +144,11 @@ function handleKeyPress(e) {
   keyboardCycleState.currentIndex++;
 }
 
-
 function resetKeyboardCycleState() {
   keyboardCycleState.currentKey = null;
   keyboardCycleState.currentIndex = 0;
 }
+
 
 // === GAME MECHANICS === (event liseners for button presses)
 function handleBoardClick(e) {
@@ -222,8 +213,6 @@ function handleWordGuessCardClick(e) {
     undoLastLetterPlaced();
   }
 }
-
-
 
 function undoLastLetterPlaced() {
   if (moveHistory.length === 0) return;
@@ -335,6 +324,10 @@ function submitWord() {
 
   // update scoreboard
   updateScoreAndWordSubmissionCount();
+
+  if (gameIsOver()) {
+    console.log('Game is Over')
+  } else console.log('Game is Not Over')
 }
 
 function undoSubmittedWord() {
@@ -412,9 +405,103 @@ function resetPuzzle() {
   displayMessage("Puzzle reset.", 'success');
 }
 
+// === SCOREBOARD FUNCTIONS
+function updateScoreAndWordSubmissionCount() {
+  const scoreCounter = document.getElementById('score-counter-nums');
+  const wordSubmissionCounter = document.getElementById('words-submitted-counter-nums');
+  const wordSubmissionCount = submittedWordsHistory.length;
+  const score = calculateScore();
+
+  scoreCounter.textContent = score;
+  wordSubmissionCounter.textContent = `${wordSubmissionCount}/6`
+}
+
+function calculateScore() {
+  const score = submittedWordsHistory.reduce((sum, word) => sum + word.cards.length, 0);
+  return score;
+}
+
+
+// === GAME OVER LOGIC
+function gameIsOver() {
+  // Step 0: the game will not be over after the first turn
+  if (submittedWordsHistory.length < 2) return false;
+
+  // Step 1: Check if we have 6 words submitted
+  if (submittedWordsHistory.length >= 6) return true;
+
+  // Step 2: Check for a perfect game
+  if (score >= 32) return true;
+
+
+  // Step 3: Check if there are any possible moves left
+  const gameBoardLettersToCheck = getCurrentGameBoard();
+
+  for (let i = 2; i <= 15; i++) {
+    const iLetterWords = generateAllPossibleWords(gameBoardLettersToCheck, i);
+    for (let word of iLetterWords) {
+      if (isValidWord(word)) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+function isValidWord(word) {
+  const validWords = window.VALID_WORDS_BY_LENGTH[word.length] || [];
+  return validWords.includes(word);
+}
+
+function getCurrentGameBoard() {
+  const cells = document.querySelectorAll('.cell');
+  const currentGameBoard = [];
+
+  for (let i = 0; i < cells.length; i++) {
+    const topCardLetter = cells[i].querySelector('.top')?.textContent ?? null;
+    const bottomCardLetter = cells[i].querySelector('.bottom')?.textContent ?? null;
+    const soloCardLetter = cells[i].querySelector('.solo')?.textContent ?? null;
+
+    const lettersInCurrentCell = []
+
+    if (soloCardLetter && !topCardLetter && !bottomCardLetter) {
+      lettersInCurrentCell.push(soloCardLetter);
+    } else {
+      if (topCardLetter) lettersInCurrentCell.push(topCardLetter)
+      if (bottomCardLetter) lettersInCurrentCell.push(bottomCardLetter)
+    }
+
+    if (lettersInCurrentCell.length > 0) currentGameBoard.push(lettersInCurrentCell);
+  }
+  return currentGameBoard
+}
+
+function generateAllPossibleWords(gameboardLetters, n) {
+  const results = [];
+
+  function recursiveWordBuilder(currentWord, availableLetters) {
+    if (currentWord.length === n) {
+      results.push(currentWord.join(''));
+      return;
+    }
+
+    for (let i = 0; i < availableLetters.length; i++) {
+      if (availableLetters[i].length === 0) continue;
+
+      const availableLettersCopy = availableLetters.map(pairs => [...pairs]);
+      const nextLetter = availableLettersCopy[i].shift();
+
+      recursiveWordBuilder([...currentWord, nextLetter], availableLettersCopy);
+    }
+  }
+
+  recursiveWordBuilder([], gameboardLetters);
+
+  return results;
+}
+
 
 // === HELPER FUNCTIONS === 
-
 function displayMessage(text, type = 'error', duration = 2500) {
   const banner = document.getElementById('message-banner');
   banner.textContent = text;
@@ -434,19 +521,12 @@ function displayMessage(text, type = 'error', duration = 2500) {
   }, duration);
 }
 
-// === UPDATE SCOREBOARD FUNCTIONS
-
-function calculateScore() {
-  const score = submittedWordsHistory.reduce((sum, word) => sum + word.cards.length, 0);
-  return score;
+// helper function to remove focus after button click:
+function addBlurredClickListener(element, handler) {
+  element.addEventListener('click', (e) => {
+    e.currentTarget.blur();
+    handler(e);
+  });
 }
 
-function updateScoreAndWordSubmissionCount() {
-  const scoreCounter = document.getElementById('score-counter-nums');
-  const wordSubmissionCounter = document.getElementById('words-submitted-counter-nums');
-  const wordSubmissionCount = submittedWordsHistory.length;
-  const score = calculateScore();
 
-  scoreCounter.textContent = score;
-  wordSubmissionCounter.textContent = `${wordSubmissionCount}/6`
-}
