@@ -105,6 +105,7 @@ function initializeEventListeners() {
     gameOverModal.classList.add('hidden');
     resetPuzzle();
   });
+  gameOverModalShareButton.addEventListener('click', shareResults);
 
 
   // add event listeners for clicking the undo, submit and reset buttons
@@ -605,4 +606,57 @@ function createWordForGameOverSummarySection(historyWordObj) {
     summaryWord.appendChild(summaryLetter);
   }
   wordList.appendChild(summaryWord)
+}
+
+
+function createEmojiArray() {
+  const finalWords = document.querySelectorAll('.summary-section-word');
+  const emojiArray = [];
+
+  for (let word of finalWords) {
+    const squares = word.querySelectorAll('.game-over-card');
+    let emojiWord = ''
+    for (let square of squares) {
+      if (square.classList.contains('green')) emojiWord += '🟩';
+      if (square.classList.contains('blue')) emojiWord += '🟦';
+    }
+    emojiArray.push(emojiWord);
+  }
+
+  return emojiArray;
+}
+
+function createShareMessage() {
+  const score = calculateScore();
+  const numOfWordsUsed = submittedWordsHistory.length;
+  const emojiArray = createEmojiArray();
+  const emojiLines = emojiArray.join('\n');
+
+  const message = `I scored ${score} points in ${numOfWordsUsed} words on today's Untitled Word Game! \n${emojiLines}\n`;
+
+  return message;
+}
+
+function shareResults() {
+  const message = createShareMessage();
+
+  if (navigator.share) {
+    navigator.share({
+      title: "Untitled Word Game #0",
+      text: message,
+    }).then(() => {
+      console.log("Shared successfully!");
+    }).catch((err) => {
+      console.error("Sharing was cancelled or failed:", err);
+    });
+  } else {
+    navigator.clipboard.writeText(message)
+      .then(() => {
+        console.log("Results copied to clipboard.");
+      })
+      .catch((err) => {
+        console.error("Failed to copy results to clipboard:", err);
+      });
+  }
+
 }
