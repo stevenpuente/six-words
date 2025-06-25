@@ -331,7 +331,7 @@ h1 span {
   /* background-color: var(--background-color-light); */
   border-radius: var(--default-border-radius);
   margin-top: -1.5rem;
-  height: 11rem;
+  height: 13.25rem;
 }
 
 .scoreboard-word {
@@ -371,11 +371,11 @@ h1 span {
   z-index: 5;
 }
 
-#scoreboard-counters{
+#scoreboard-counters {
   margin: 0 .5rem;
 }
 
-#scoreboard-counters-text{
+#scoreboard-counters-text {
   margin: 0;
   margin-bottom: 0rem;
   padding: 0;
@@ -387,7 +387,7 @@ h1 span {
   font-weight: 100;
 }
 
-#scoreboard-counters-nums{
+#scoreboard-counters-nums {
   margin: 0;
   padding: 0;
   display: flex;
@@ -400,14 +400,165 @@ h1 span {
 
 
 
+/* Modal Styles */
+
+#game-over-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(20, 20, 20, .85);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  z-index: 1000;
+}
+
+#game-over-modal.hidden {
+  display: none;
+}
+
+
+.modal-content {
+  background-color: var(--background-color-light);
+  border-radius: var(--default-border-radius);
+  padding: 2rem;
+  margin-top: 9.25rem;
+  width: 85%;
+  max-width: 35rem;
+  text-align: center;
+  font-family: var(--sans-serif-font-family);
+}
+
+
+h2 {
+  font-size: 3.5rem;
+  font-family: var(--serif-font-family);
+  margin: 1.5rem;
+  line-height: 1;
+}
+
+h3 {
+  font-size: 1.75rem;
+  font-family: var(--sans-serif-font-family-font-family);
+  margin: 0rem;
+  margin-top: -1rem;
+  margin-bottom: 3rem;
+  line-height: 1;
+  font-weight: 100;
+}
+
+#game-over-modal #logo {
+  height: 100%;
+  width: 100%;
+  max-width: 3.5rem;
+  max-height: 3.5rem;
+  display: inline-grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr 1fr;
+  gap: .05em;
+}
+
+#game-over-modal .cell {
+  aspect-ratio: 1/1;
+  width: 100%;
+  height: 100%;
+  border: .5px solid var(--thin-cell-border-color);
+  background: var(--background-color-light);
+  min-width: initial;
+  min-height: initial;
+}
+
+#game-over-modal .cell .card {
+  border-radius: .05em;
+}
+
+#game-over-modal #game-over-stats {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 2rem 0 1rem;
+}
+
+#game-over-summary-section {
+  display: flex;
+  flex-direction: column;
+  gap: .25rem;
+  justify-content: center;
+  align-items: center;
+}
+
+#game-over-summary-section .summary-section-word {
+  display: flex;
+  gap: var(--gap-for-scoreboard-letters);
+  flex-wrap: nowrap;
+  justify-content: center;
+}
+
+#game-over-summary-section .game-over-card {
+  width: 2rem;
+  height: 2rem;
+  font-size: var(--scoreboard-word-card-font-size);
+  color: var(--text-color-light);
+  border-radius: var(--default-border-radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#game-over-summary-section .game-over-card.green {
+  background-color: var(--green-card-color);
+}
+
+#game-over-summary-section .game-over-card.blue {
+  background-color: var(--blue-card-color);
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.modal-buttons button {
+  font-size: 1.2rem;
+  padding: 0.75rem 2rem;
+  border: none;
+  border-radius: 5em;
+  font-family: var(--sans-serif-font-family);
+  color: var(--text-color-light);
+  background-color: var(--submit-button-color);
+  transition: background-color 0.3s ease;
+  height: 4rem;
+  width: 40%;
+  max-width: 12rem;
+}
+
+.modal-buttons button:hover {
+  background-color: var(--submit-button-color-hover);
+}
+
+
+
+
+
+
+
+
+
+
 
 
 @media (pointer: coarse) {
-  .button, .card {
+
+  .button,
+  .card {
     touch-action: manipulation;
     user-select: none;
   }
-  
+
 }
 
 /* placeholder for medium devices (768-991px) */
@@ -420,4 +571,3 @@ h1 span {
 /* placeholder for large devices (992+px) */
 /* @media (min-width: 992px) {
 } */
-

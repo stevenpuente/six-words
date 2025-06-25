@@ -326,8 +326,8 @@ function submitWord() {
   updateScoreAndWordSubmissionCount();
 
   if (gameIsOver()) {
-    console.log('Game is Over')
-  } else console.log('Game is Not Over')
+    showGameOverModal();
+  }
 }
 
 function undoSubmittedWord() {
@@ -422,7 +422,7 @@ function calculateScore() {
 }
 
 
-// === GAME OVER LOGIC
+// === GAME OVER LOGIC ===
 function gameIsOver() {
   // Step 0: the game will not be over after the first turn
   if (submittedWordsHistory.length < 2) return false;
@@ -529,4 +529,64 @@ function addBlurredClickListener(element, handler) {
   });
 }
 
+// === GAME OVER MODAL ===
 
+function showGameOverModal() {
+  const modal = document.getElementById('game-over-modal');
+  const title = document.getElementById('game-over-title');
+  const subTitle = document.getElementById('game-over-sub-title');
+  const stats = document.getElementById('game-over-stats');
+  const wordList = document.getElementById('game-over-summary-section');
+
+  const score = calculateScore();
+  const wordsUsed = submittedWordsHistory.length;
+
+  // Title message
+  if (score >= 32) {
+    title.textContent = "Perfect!";
+    subTitle.textContent = 'You Cleared The Board!';
+  } else if (wordsUsed >= 6) {
+    title.textContent = "Game Over!";
+    subTitle.textContent = 'You Used All Six Guesses!';
+  } else {
+    title.textContent = "Game Over!";
+    subTitle.textContent = 'No Moves Left!';
+  }
+
+  stats.textContent = `Score: ${score} / 32 | Words Submitted: ${wordsUsed} / 6`;
+
+  wordList.innerHTML = '';
+
+  for (let word of submittedWordsHistory) {
+    createWordForGameOverSummarySection(word)
+  }
+  modal.classList.remove('hidden');
+}
+
+
+function createWordForGameOverSummarySection(historyWordObj) {
+  if (historyWordObj.word.length !== historyWordObj.cards.length) {
+    console.log('error while generating summary word: word length does not match card length');
+    return
+  }
+
+  const wordList = document.getElementById('game-over-summary-section');
+  const summaryWord = document.createElement('div');
+  summaryWord.classList.add('summary-section-word');
+
+  for (let i = 0; i < historyWordObj.word.length; i++) {
+    const historyCard = historyWordObj.cards[i];
+    const historyLetter = historyWordObj.word[i];
+
+    const summaryLetter = document.createElement('div');
+
+    summaryLetter.classList.add('game-over-card');
+    summaryLetter.innerHTML = `<span>${historyLetter}</span>`;
+
+    if (historyCard.classList.contains('green')) summaryLetter.classList.add('green');
+    if (historyCard.classList.contains('blue')) summaryLetter.classList.add('blue');
+
+    summaryWord.appendChild(summaryLetter);
+  }
+  wordList.appendChild(summaryWord)
+}
