@@ -446,6 +446,7 @@ h1 span {
   font-size: 1.2rem;
   font-family: var(--sans-serif-font-family);
   font-weight: 400;
+  color: var(--text-color-dark);
 }
 
 .close-icon {
