@@ -17,6 +17,12 @@ const submitButton = document.getElementById('submit-button');
 const resetButton = document.getElementById('reset-button');
 const scoreboard = document.getElementById('scoreboard');
 const gameBoardElement = document.getElementById('game-board');
+// MODAL DOM ELEMENTS
+const gameOverModal = document.getElementById('game-over-modal');
+const gameOverModalCloseButton = document.getElementById('close-modal-button');
+const gameOverModalShareButton = document.getElementById('share-button');
+const gameOverModalPlayAgainButton = document.getElementById('play-again-button');
+
 
 
 // === INITIALIZATION === (this listener fires when dom content is loaded, effectively kicking off the game)
@@ -90,6 +96,16 @@ function initializeEventListeners() {
 
   // add event listener to game board
   gameBoardElement.addEventListener('click', handleBoardClick);
+
+  // Game Over Modal Event Listeners:
+  gameOverModalCloseButton.addEventListener('click', () => {
+    gameOverModal.classList.add('hidden')
+  });
+  gameOverModalPlayAgainButton.addEventListener('click', () => {
+    gameOverModal.classList.add('hidden');
+    resetPuzzle();
+  });
+
 
   // add event listeners for clicking the undo, submit and reset buttons
   addBlurredClickListener(undoButton, undoSubmittedWord);
