@@ -632,7 +632,7 @@ function createShareMessage() {
   const emojiArray = createEmojiArray();
   const emojiLines = emojiArray.join('\n');
 
-  const message = `I scored ${score} points in ${numOfWordsUsed} words on today's Untitled Word Game! \n${emojiLines}\n`;
+  const message = `Untitled Word Game #0\nI scored ${score} points in ${numOfWordsUsed} words on today's Untitled Word Game! \n${emojiLines}\n`;
 
   return message;
 }
@@ -642,7 +642,6 @@ function shareResults() {
 
   if (navigator.share) {
     navigator.share({
-      title: "Untitled Word Game #0",
       text: message,
     }).then(() => {
       console.log("Shared successfully!");
