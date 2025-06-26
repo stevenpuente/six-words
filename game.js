@@ -9,7 +9,6 @@ const keyboardCycleState = {
   currentIndex: 0,
 };
 
-
 // DOM Elements
 const wordGuessWrapper = document.getElementById('word-guess-wrapper');
 const undoButton = document.getElementById('undo-button');
@@ -17,12 +16,12 @@ const submitButton = document.getElementById('submit-button');
 const resetButton = document.getElementById('reset-button');
 const scoreboard = document.getElementById('scoreboard');
 const gameBoardElement = document.getElementById('game-board');
+
 // MODAL DOM ELEMENTS
 const gameOverModal = document.getElementById('game-over-modal');
 const gameOverModalCloseButton = document.getElementById('close-modal-button');
 const gameOverModalShareButton = document.getElementById('share-button');
 const gameOverModalPlayAgainButton = document.getElementById('play-again-button');
-
 
 
 // === INITIALIZATION === (this listener fires when dom content is loaded, effectively kicking off the game)
@@ -580,7 +579,6 @@ function showGameOverModal() {
   modal.classList.remove('hidden');
 }
 
-
 function createWordForGameOverSummarySection(historyWordObj) {
   if (historyWordObj.word.length !== historyWordObj.cards.length) {
     console.log('error while generating summary word: word length does not match card length');
@@ -607,7 +605,6 @@ function createWordForGameOverSummarySection(historyWordObj) {
   }
   wordList.appendChild(summaryWord)
 }
-
 
 function createEmojiArray() {
   const finalWords = document.querySelectorAll('.summary-section-word');

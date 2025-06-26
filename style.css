@@ -45,6 +45,9 @@
 
   /* rounded corner variables */
   --default-border-radius: .5rem;
+
+  /* Game Over Modal */
+
 }
 
 *,
@@ -94,9 +97,22 @@ h1 span {
   background-color: var(--background-color-light);
   font-family: var(--serif-font-family);
   border-radius: var(--default-border-radius);
-  width: max(100%, 25rem);
+  width: 100%;
   max-width: 40rem;
   padding: 1rem;
+}
+
+#placeholder {
+  font-family: var(--serif-font-family);
+  font-weight: 100;
+  border-top: 1px solid var(--text-color-dark);
+  color: var(--text-color-dark);
+  width: 70%;
+  text-align: center;
+  position: absolute;
+  top: 6.5rem;
+  line-height: 1;
+  font-size: 1.2rem;
 }
 
 #message-banner {
@@ -152,7 +168,19 @@ h1 span {
   font-size: var(--word-guess-wrapper-card-font-size);
 }
 
+/* change this one if #placeholder removed */
 #column-wrapper {
+  width: 100%;
+  border-radius: var(--default-border-radius);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+  margin-top: 1rem;       
+  /* remove margin-top if the #placeholder element is removed */
+}
+
+#scoreboard-area-wrapper {
   width: 100%;
   border-radius: var(--default-border-radius);
   display: flex;
@@ -188,7 +216,6 @@ h1 span {
   border: .5px solid var(--thin-cell-border-color);
   position: relative;
   background: var(--background-color-light);
-  /* border-radius: var(--default-border-radius); */
   min-height: 3rem;
   max-height: 8rem;
   min-width: 3rem;
@@ -361,13 +388,11 @@ h1 span {
 
 .cell .card.top.raised {
   transform: translate(-35%, -35%) scale(1.175);
-  /* box-shadow: 0 2px 15px rgba(0, 0, 0, 0.5); */
   z-index: 5;
 }
 
 .cell .card.solo.raised {
   transform: translate(-50%, -50%) scale(1.175);
-  /* box-shadow: 0 2px 15px rgba(0, 0, 0, 0.5); */
   z-index: 5;
 }
 
@@ -398,10 +423,7 @@ h1 span {
   font-weight: 100;
 }
 
-
-
 /* Modal Styles */
-
 #game-over-modal {
   position: fixed;
   top: 0;
@@ -511,7 +533,7 @@ h3 {
 #game-over-summary-section {
   display: flex;
   flex-direction: column;
-  gap: .25rem;
+  gap: var(--gap-for-scoreboard-letters);
   justify-content: center;
   align-items: center;
 }
@@ -553,7 +575,7 @@ h3 {
   font-size: 1.2rem;
   padding: 0.75rem 2rem;
   border: none;
-  border-radius: 5em;
+  border-radius: 6rem;
   font-family: var(--sans-serif-font-family);
   color: var(--text-color-light);
   background-color: var(--submit-button-color);
@@ -567,16 +589,7 @@ h3 {
   background-color: var(--submit-button-color-hover);
 }
 
-
-
-
-
-
-
-
-
-
-
+/* Responsive Design */
 
 @media (pointer: coarse) {
 
@@ -585,14 +598,45 @@ h3 {
     touch-action: manipulation;
     user-select: none;
   }
-
 }
 
 /* placeholder for medium devices (768-991px) */
 /* @media (min-width: 768px) {
   #main-container {
-  max-width: 90rem;
-}
+    max-width: 82rem;
+  }
+
+  #word-guess-wrapper {
+    align-self: flex-end;
+    width: 50%;
+    margin-left: 1rem;
+  }
+
+  #column-wrapper {
+    flex-direction: row-reverse;
+  }
+
+  #scoreboard-area-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+
+  #scoreboard-counters {
+    justify-self: flex-start;
+    margin: 0 10%;
+  }
+
+  #scoreboard {
+    margin: 1rem;
+
+  }
+
+  .scoreboard-word .card {
+    width: 3rem;
+    height: 3rem;
+  }
+
 } */
 
 /* placeholder for large devices (992+px) */
