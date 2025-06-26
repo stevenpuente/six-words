@@ -1,5 +1,9 @@
 let GENERATE_WORDS_BY_LENGTH = {};
 
+// PSUEDO RANDOM VARIABLES:
+const seed = getSeedFromDate(); 
+const rng = mulberry32(seed)
+
 async function generateWords() {
   try {
     const response = await fetch('generate_words_by_length.json');
@@ -30,13 +34,13 @@ function pickRandomWord(wordsByLength, length) {
   if (!list || list.length === 0) {
     throw new Error(`No words found of length ${length}`);
   }
-  return list[Math.floor(Math.random() * list.length)].toUpperCase();
+  return list[Math.floor(rng() * list.length)].toUpperCase();
 }
 
 // Helper: Shuffle an array in place (Fisher-Yates)
 function shuffle(array) {
   for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
+    const j = Math.floor(rng() * (i + 1));
     [array[i], array[j]] = [array[j], array[i]];
   }
   return array;
@@ -106,4 +110,22 @@ function generateRandomBoard() {
       split: splitWords
     }
   };
+}
+
+
+function mulberry32(seed) {
+  return function () {
+    let t = seed += 0x6D2B79F5;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function getSeedFromDate(date = new Date()) {
+  const year = date.getFullYear();
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
+
+  return parseInt(`${year}${String(month).padStart(2, '0')}${String(day).padStart(2, '0')}`, 10)
 }
