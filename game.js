@@ -16,12 +16,14 @@ const submitButton = document.getElementById('submit-button');
 const resetButton = document.getElementById('reset-button');
 const scoreboard = document.getElementById('scoreboard');
 const gameBoardElement = document.getElementById('game-board');
+const welcomeModal = document.getElementById('welcome-modal-wrapper');
 
 // MODAL DOM ELEMENTS
 const gameOverModal = document.getElementById('game-over-modal');
 const gameOverModalCloseButton = document.getElementById('close-modal-button');
 const gameOverModalShareButton = document.getElementById('share-button');
 const gameOverModalPlayAgainButton = document.getElementById('play-again-button');
+const playButton = document.getElementById('play-button');
 
 
 // === INITIALIZATION === (this listener fires when dom content is loaded, effectively kicking off the game)
@@ -92,6 +94,9 @@ function addCardsAndGrid() {
 
 // This is called within the initial domcontentloaded event listner and then adds click listeners to all top cards that were generated in addcardsandgrid
 function initializeEventListeners() {
+
+  // Welcome Screen play button listener:
+  playButton.addEventListener('click', () => welcomeModal.classList.add('hidden'));
 
   // add event listener to game board
   gameBoardElement.addEventListener('click', handleBoardClick);

@@ -66,8 +66,10 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   font-family: var(--sans-serif-font-family);
+  position: relative;
+  height: 100vh;
 }
 
 h1 {
@@ -176,7 +178,7 @@ h1 span {
   flex-direction: column;
   justify-content: center;
   align-items: stretch;
-  margin-top: 1rem;       
+  margin-top: 1rem;
   /* remove margin-top if the #placeholder element is removed */
 }
 
@@ -588,6 +590,100 @@ h3 {
 .modal-buttons button:hover {
   background-color: var(--submit-button-color-hover);
 }
+
+
+
+/* welcome screen modal */
+
+#welcome-modal-wrapper {
+  width: 100%;
+  height: 100%;
+  border-radius: var(--default-border-radius);
+  background-color: var(--background-color-light);
+  position: relative;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  position: absolute;
+}
+
+#welcome-modal-wrapper.hidden {
+  display: none;
+}
+
+#welcome-modal {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+#welcome-modal #logo {
+  margin: 2rem;
+  height: 100%;
+  width: 100%;
+  max-width: 7rem;
+  max-height: 7rem;
+  display: inline-grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr 1fr;
+  gap: .05em;
+}
+
+#welcome-modal .cell {
+  aspect-ratio: 1/1;
+  width: 100%;
+  height: 100%;
+  border: .5px solid var(--thin-cell-border-color);
+  background: var(--background-color-light);
+  min-width: initial;
+  min-height: initial;
+}
+
+#welcome-modal .cell .card {
+  border-radius: .05em;
+}
+
+
+#welcome-modal h2 {
+  font-size: 2.8rem;
+  margin: 1rem;
+}
+
+#welcome-modal h3 {
+  margin-top: 0;
+  margin-bottom: 4rem;
+}
+
+#welcome-modal button {
+  border-radius: 2em;
+  background-color: var(--background-color-light);
+  border: 2px solid var(--background-color-dark);
+  padding: 1rem 8rem;
+  font-family: var(--sans-serif-font-family);
+  font-size: 1.6rem;
+  color: var(--text-color-dark);
+  transition: ball 0.3s ease;
+}
+
+#welcome-modal button:hover {
+  color: var(--text-color-light);
+  background-color: var(--background-color-dark);
+}
+
+#welcome-modal-sub-text {
+  margin: 3rem;
+}
+
+#welcome-modal-sub-text p {
+  margin: .25rem;
+  margin-top: 0;
+}
+
+
 
 /* Responsive Design */
 
