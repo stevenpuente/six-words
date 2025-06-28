@@ -112,9 +112,7 @@ function initializeEventListeners() {
   gameOverModalShareButton.addEventListener('click', shareResults);
 
   // Prevent double tap to zoom
-  document.ondblclick = function () {
-    e.preventDefault();
-  }
+  document.addEventListener('dblclick', (e) => e.preventDefault())
 
   // add event listeners for clicking the undo, submit and reset buttons
   addBlurredClickListener(undoButton, undoSubmittedWord);
