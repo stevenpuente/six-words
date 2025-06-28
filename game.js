@@ -288,35 +288,28 @@ function submitWord() {
     return;
   }
 
-  if (word.length < 2 || word.length > 15) {
-    displayMessage("Word must be between 2 and 15 letters.", 'error');
+  if (word.length < 2) {
+    displayMessage("Too short", 'error');
+    return;
+  }
+
+  if (word.length > 15) {
+    displayMessage("Too long", 'error');
     return;
   }
 
   const validWords = window.VALID_WORDS_BY_LENGTH[word.length] || [];
   if (!validWords.includes(word)) {
-    displayMessage(`"${word}" is not in the word list!`, 'error');
+    displayMessage(`Not in the word list!`, 'error');
     // if the word is incorrect, remove from the word guess area
     clearGuess();
     return;
   }
 
-  if (word.length === 3) {
-    displayMessage(`"${word}" Good!`, 'success');
-  } else if (word.length === 4) {
-    displayMessage(`"${word}" Nice!`, 'success');
-  } else if (word.length === 5) {
-    displayMessage(`"${word}" Awesome!`, 'success');
-  } else if (word.length >= 6 && word.length <= 7) {
-    displayMessage(`"${word}" Incredible!`, 'success');
-  } else if (word.length >= 8 && word.length <= 12) {
-    displayMessage(`"${word}" Amazing!`, 'success');
-  } else if (word.length >= 13 && word.length <= 14) {
-    displayMessage(`"${word}" Fantastic!`, 'success');
-  } else if (word.length === 15) {
-    displayMessage(`"${word}" Superb!`, 'success');
+  if (word.length >= 3 && word.length <= 15) {
+    displayMessage(`Nice! + ${word.length} points`, 'success');
   } else {
-    displayMessage(`"${word}" submitted!`, 'success');
+    displayMessage(`Nice!`, 'success');
   }
 
   const scoreboardRow = document.createElement('div');
@@ -423,7 +416,7 @@ function resetPuzzle() {
   }
 
   // Also clear any messages, if desired
-  displayMessage("Puzzle reset.", 'success');
+  // displayMessage("Puzzle reset.", 'success');
 }
 
 // === SCOREBOARD FUNCTIONS
@@ -560,21 +553,31 @@ function showGameOverModal() {
   const wordList = document.getElementById('game-over-summary-section');
 
   const score = calculateScore();
+  const lettersLeft = 32 - score;
   const wordsUsed = submittedWordsHistory.length;
 
   // Title message
   if (score >= 32) {
-    title.textContent = "Perfect!";
-    subTitle.textContent = 'You Cleared The Board!';
-  } else if (wordsUsed >= 6) {
-    title.textContent = "Game Over!";
-    subTitle.textContent = 'You Used All Six Guesses!';
-  } else {
-    title.textContent = "Game Over!";
-    subTitle.textContent = 'No Moves Left!';
+    title.textContent = `Perfect in ${wordsUsed}`;
+    subTitle.textContent = `You cleared the board in ${wordsUsed} words`;
+  } else if (lettersLeft === 1) {
+    title.textContent = 'Game Over!';
+    subTitle.textContent = `You had 1 letter left!`;
+  } else if (lettersLeft >= 1) {
+    title.textContent = 'Game Over!';
+    subTitle.textContent = `You had ${lettersLeft} letters left!`;
   }
 
-  stats.textContent = `Score: ${score} / 32 | Words Submitted: ${wordsUsed} / 6`;
+
+  // else if (wordsUsed >= 6) {
+  //   title.textContent = "Game Over!";
+  //   subTitle.textContent = 'You Used All Six Guesses!';
+  // } else {
+  //   title.textContent = "Game Over!";
+  //   subTitle.textContent = 'No Moves Left!';
+  // }
+
+  stats.textContent = `Score: ${score} / 32 | Words used: ${wordsUsed} / 6`;
 
   wordList.innerHTML = '';
 
@@ -634,9 +637,12 @@ function createShareMessage() {
   const emojiArray = createEmojiArray();
   const emojiLines = emojiArray.join('\n');
 
-  const message = `Untitled Word Game #0\nI scored ${score} points in ${numOfWordsUsed} words on today's Untitled Word Game! \n${emojiLines}\n`;
+  const lines = [
+    `I scored ${score} points in ${numOfWordsUsed} words on today's puzzle!`,
+    emojiLines,
+  ]
 
-  return message;
+  return lines.join('\r\n').trim();
 }
 
 function shareResults() {
@@ -644,6 +650,7 @@ function shareResults() {
 
   if (navigator.share) {
     navigator.share({
+      title: 'Six Words #0',
       text: message,
     }).then(() => {
       console.log("Shared successfully!");
@@ -659,5 +666,4 @@ function shareResults() {
         console.error("Failed to copy results to clipboard:", err);
       });
   }
-
 }
