@@ -31,6 +31,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   submitButton.disabled = true;
   undoButton.disabled = true;   //inactive until first word submitted
 
+
   try {
     // Wait for both word lists: validation + generation
     await Promise.all([
@@ -44,6 +45,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     gameBoard.push(...board); // board is 16 pairs like [['A','B'], ...]
     console.log("Game board generated with words:", wordsUsed);       // Remove this once satisfied with game quality
 
+    setVH();
     addCardsAndGrid();          // Adds cards to the DOM
     initializeEventListeners(); // Adds listeners for clicks
 
@@ -54,6 +56,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.error(error);
   }
 });
+
+function setVH() {
+  const vh = window.innerHeight * 0.01;
+  document.documentElement.style.setProperty('--vh', `${vh}px`);
+}
 
 // This is called within the initial domcontentloaded event listener and adds 16 cells and 32 cards to the gameboard programatically
 function addCardsAndGrid() {
@@ -94,6 +101,8 @@ function addCardsAndGrid() {
 
 // This is called within the initial domcontentloaded event listner and then adds click listeners to all top cards that were generated in addcardsandgrid
 function initializeEventListeners() {
+
+  window.addEventListener('resize', setVH);
 
   // Welcome Screen play button listener:
   playButton.addEventListener('click', () => welcomeModal.classList.add('hidden'));

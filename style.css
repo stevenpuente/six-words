@@ -49,6 +49,7 @@
   --scoreboard-word-card-font-size: 1rem;
 
   /* spacing variables */
+  --vh: 100vh;
   --gap-for-game-board-and-word-guess: .3rem;
   --gap-for-scoreboard-letters: .25rem;
 
@@ -83,8 +84,8 @@ body {
 html,
 body {
   height: 100.5vh;
-
-  /* touch-action: manipulation; */
+  overscroll-behavior: none;
+  touch-action: manipulation;
 }
 
 #main-container {
@@ -95,6 +96,7 @@ body {
   align-items: center;
   justify-content: flex-start;
   font-family: var(--sans-serif-font-family);
+  height: calc(var(--vh, 1vh) * 100);
 }
 
 h1 {
@@ -152,7 +154,7 @@ h1 span {
   text-align: center;
   font-size: var(--message-banner-font-size);
   font-weight: bold;
-  border-radius: var(--default-wrapper-border-radius-border-radius);
+  border-radius: var(--default-wrapper-border-radius);
   background-color: var(--message-banner-error-color);
   /* red by default */
   color: var(--text-color-light);
@@ -172,7 +174,7 @@ h1 span {
 }
 
 #word-guess-wrapper {
-  margin: 1rem 0;
+  margin: 1rem;
   width: 100%;
   border-radius: var(--default-wrapper-border-radius);
   display: flex;
@@ -203,8 +205,6 @@ h1 span {
   flex-direction: column;
   justify-content: center;
   align-items: stretch;
-  margin-top: 1rem;
-  /* remove margin-top if the #placeholder element is removed */
 }
 
 #scoreboard-area-wrapper {
@@ -228,12 +228,11 @@ h1 span {
 #game-board {
   height: 100%;
   width: 100%;
-  max-width: 32rem;
-  max-height: 32rem;
+  max-width: 30rem;
+  max-height: 30rem;
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr;
   grid-template-rows: 1fr 1fr 1fr 1fr;
-  gap: var(--gap-for-game-board-and-word-guess);
 }
 
 .cell {
@@ -334,7 +333,8 @@ h1 span {
 }
 
 #button-wrapper {
-  padding: 2rem 0;
+  margin-top: 1rem;
+  margin-bottom: 2rem;
   display: flex;
   justify-content: center;
   width: 100%;
@@ -531,7 +531,7 @@ h2 {
 
 h3 {
   font-size: 1.8rem;
-  font-family: var(--sans-serif-font-family-font-family);
+  font-family: var(--sans-serif-font-family);
   margin: 0rem;
   margin-top: -1rem;
   margin-bottom: 3rem;
@@ -747,6 +747,10 @@ h3 {
   body {
     display: flex;
     flex-direction: column;
+    justify-content: center;
+  }
+
+  #main-container {
     justify-content: center;
   }
 
