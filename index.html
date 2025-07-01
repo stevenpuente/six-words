@@ -22,35 +22,28 @@
 <body>
     <div id="main-container">
         <h1><b>Six Words</b>
-            <!-- <span>January 1, 2026</span> -->
         </h1>
         <div id="main-card">
-            <!-- <div id="placeholder">Clear the board in 6 words or less</div> -->
             <div id="message-banner" class="hidden"></div>
             <div id="word-guess-wrapper"></div>
-            <div id="column-wrapper">
-                <div id="game-board-wrapper">
-                    <div id="game-board">
+            <div id="game-board"></div>
+            <div id="button-wrapper">
+                <button id="undo-button">Undo</button>
+                <button id="reset-button">Reset</button>
+                <button id="submit-button">Submit</button>
+            </div>
+            <div id="scoreboard-area-wrapper">
+                <div id="scoreboard-counters">
+                    <div id="scoreboard-counters-text">
+                        <span id="score-counter-text">SCORE:</span>
+                        <span id="words-submitted-counter-text">WORDS USED:</span>
                     </div>
-                    <div id="button-wrapper">
-                        <button id="undo-button">Undo</button>
-                        <button id="reset-button">Reset</button>
-                        <button id="submit-button">Submit</button>
+                    <div id="scoreboard-counters-nums">
+                        <span id="score-counter-nums">0</span>
+                        <span id="words-submitted-counter-nums">0/6</span>
                     </div>
                 </div>
-                <div id="scoreboard-area-wrapper">
-                    <div id="scoreboard-counters">
-                        <div id="scoreboard-counters-text">
-                            <span id="score-counter-text">SCORE:</span>
-                            <span id="words-submitted-counter-text">WORDS USED:</span>
-                        </div>
-                        <div id="scoreboard-counters-nums">
-                            <span id="score-counter-nums">0</span>
-                            <span id="words-submitted-counter-nums">0/6</span>
-                        </div>
-                    </div>
-                    <div id="scoreboard"></div>
-                </div>
+                <div id="scoreboard"></div>
             </div>
         </div>
     </div>
