@@ -10,6 +10,7 @@ const keyboardCycleState = {
 };
 
 // DOM Elements
+const banner = document.getElementById('message-banner');
 const wordGuessWrapper = document.getElementById('word-guess-wrapper');
 const undoButton = document.getElementById('undo-button');
 const submitButton = document.getElementById('submit-button');
@@ -28,9 +29,7 @@ const playButton = document.getElementById('play-button');
 
 // === INITIALIZATION === (this listener fires when dom content is loaded, effectively kicking off the game)
 document.addEventListener('DOMContentLoaded', async () => {
-  submitButton.disabled = true;
-  undoButton.disabled = true;   //inactive until first word submitted
-
+  setAllButtonStates();
 
   try {
     // Wait for both word lists: validation + generation
@@ -49,10 +48,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     addCardsAndGrid();          // Adds cards to the DOM
     initializeEventListeners(); // Adds listeners for clicks
 
-    submitButton.disabled = false;
   } catch (error) {
     displayMessage('Failed to load word list. Please reload.', 'error', 5000);
-    submitButton.disabled = true;
     console.error(error);
   }
 });
@@ -124,7 +121,7 @@ function initializeEventListeners() {
   document.addEventListener('dblclick', (e) => e.preventDefault())
 
   // add event listeners for clicking the undo, submit and reset buttons
-  addBlurredClickListener(undoButton, undoSubmittedWord);
+  addBlurredClickListener(undoButton, undoHandler);
   addBlurredClickListener(submitButton, submitWord);
   addBlurredClickListener(resetButton, resetPuzzle);
   wordGuessWrapper.addEventListener('click', handleWordGuessCardClick);
@@ -133,9 +130,10 @@ function initializeEventListeners() {
 
 // === KEYBOARD MECHANICS === (event liseners for button presses)
 function handleKeyPress(e) {
+  
   if (e.key === 'Backspace' || e.key === 'Delete') {
     resetKeyboardCycleState();
-    undoSubmittedWord();
+    undoHandler();
     return;
   }
 
@@ -197,7 +195,6 @@ function handleBoardClick(e) {
 
 function moveCardToGuessArea(topCard) {
   topCard.classList.remove('raised');
-  undoButton.disabled = false;
   const cell = topCard.parentElement;
   const bottomCard = cell.querySelector('.card.bottom');
 
@@ -212,6 +209,7 @@ function moveCardToGuessArea(topCard) {
   // Move top card to guess area
   cell.removeChild(topCard);
   wordGuessWrapper.appendChild(topCard);
+  banner.classList.add('hidden');
 
   // Promote bottom card if exists
   if (bottomCard) {
@@ -228,6 +226,8 @@ function moveCardToGuessArea(topCard) {
   }
 
   moveHistory.push(move);
+
+  setAllButtonStates();
 }
 
 function handleWordGuessCardClick(e) {
@@ -283,6 +283,8 @@ function undoLastLetterPlaced() {
     // Re-add to original cell
     lastMove.cell.appendChild(card);
   }
+
+  setAllButtonStates();
 }
 
 function submitWord() {
@@ -314,6 +316,7 @@ function submitWord() {
     displayMessage(`Not in the word list!`, 'error');
     // if the word is incorrect, remove from the word guess area
     clearGuess();
+    setAllButtonStates();
     return;
   }
 
@@ -344,68 +347,55 @@ function submitWord() {
     scoreboardRow
   });
 
-  // Enable Undo
-  undoButton.disabled = false;
-
   // update scoreboard
   updateScoreAndWordSubmissionCount();
+
+  setAllButtonStates();
 
   if (gameIsOver()) {
     showGameOverModal();
   }
 }
 
-function undoSubmittedWord() {
+function unSubmitWord() {
+  if (submittedWordsHistory.length === 0) return;
+
+  const lastWord = submittedWordsHistory.pop();
+  if (!lastWord || !lastWord.moves || !lastWord.scoreboardRow) return;
+
+  // remove from scoreboard
+  if (lastWord.scoreboardRow.parentElement) {
+    lastWord.scoreboardRow.parentElement.removeChild(lastWord.scoreboardRow);
+  }
+
+  // move cards back into guess area
+  for (let card of lastWord.cards) {
+    wordGuessWrapper.appendChild(card);
+  };
+
+  moveHistory.push(...lastWord.moves);
+  banner.classList.add('hidden');
+
+
+  setAllButtonStates();
+  updateScoreAndWordSubmissionCount();
+}
+
+function undoHandler() {
   const guessCards = document.querySelectorAll('#word-guess-wrapper .card');
   if (submittedWordsHistory.length === 0 && guessCards.length === 0) return;
 
   // Step 1: if there are guess cards, remove last card
-  if (guessCards.length !== 0) {
+  if (guessCards.length > 0) {
     undoLastLetterPlaced();
     return;
   };
 
   // Step 2: Retrieve last submitted word info
-  const lastWord = submittedWordsHistory.pop();
-  if (!lastWord || !lastWord.moves || !lastWord.scoreboardRow) return;
+  unSubmitWord();
 
-  // Remove word row from scoreboard
-  if (lastWord.scoreboardRow.parentElement) {
-    lastWord.scoreboardRow.parentElement.removeChild(lastWord.scoreboardRow);
-  }
-
-  // Step 3: Restore cards
-  for (const move of lastWord.moves.reverse()) {
-    const { movedCard, movedCardOriginalParent, movedCardOriginalClasses } = move;
-
-    if (movedCard.parentElement) {
-      movedCard.parentElement.removeChild(movedCard);
-    }
-
-    movedCard.className = '';
-    movedCardOriginalClasses.forEach(cls => movedCard.classList.add(cls));
-    movedCardOriginalParent.appendChild(movedCard);
-
-    // Restore promoted card, if any
-    if (move.promotedCardInfo) {
-      const { card, originalClasses } = move.promotedCardInfo;
-
-      if (card.parentElement) {
-        card.parentElement.removeChild(card);
-      }
-
-      card.className = '';
-      originalClasses.forEach(cls => card.classList.add(cls));
-      move.cell.appendChild(card);
-    }
-  }
-
-  // Step 4: Disable undo if no more submitted words
-  if (submittedWordsHistory.length === 0 && guessCards.length === 0) {
-    undoButton.disabled = true;
-  }
-
-  // Step 5 Update Scoreboard
+  // Step 3: Update UI
+  setAllButtonStates();
   updateScoreAndWordSubmissionCount();
 
 }
@@ -423,8 +413,10 @@ function resetPuzzle() {
 
   // Then, keep undoing submitted words until none remain
   while (submittedWordsHistory.length > 0) {
-    undoSubmittedWord();
+    undoHandler();
   }
+
+  setAllButtonStates();
 
   // Also clear any messages, if desired
   // displayMessage("Puzzle reset.", 'success');
@@ -528,7 +520,6 @@ function generateAllPossibleWords(gameboardLetters, n) {
 
 // === HELPER FUNCTIONS === 
 function displayMessage(text, type = 'error', duration = 2500) {
-  const banner = document.getElementById('message-banner');
   banner.textContent = text;
   banner.className = ''; // reset
   banner.classList.add(type === 'error' ? 'error' : 'success');
@@ -552,6 +543,25 @@ function addBlurredClickListener(element, handler) {
     e.currentTarget.blur();
     handler(e);
   });
+}
+
+function setAllButtonStates() {
+  // check if there are undo moves and set undo button
+  if (moveHistory.length === 0 && submittedWordsHistory.length === 0) {
+    resetButton.disabled = true;
+    undoButton.disabled = true;
+  } else {
+    undoButton.disabled = false;
+    resetButton.disabled = false;
+  }
+
+  // check if the current board is submittable
+  if (moveHistory.length < 2 || moveHistory.length > 15) {
+    submitButton.disabled = true;
+  } else submitButton.disabled = false;
+
+
+
 }
 
 // === GAME OVER MODAL ===
