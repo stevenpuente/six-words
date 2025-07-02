@@ -130,7 +130,17 @@ function initializeEventListeners() {
 
 // === KEYBOARD MECHANICS === (event liseners for button presses)
 function handleKeyPress(e) {
-  
+
+  if (e.key === 'Escape') {
+    if (!document.getElementById('welcome-modal-wrapper').classList.contains('hidden')) {
+      document.getElementById('welcome-modal-wrapper').classList.add('hidden');
+    } else if (!document.getElementById('game-over-modal').classList.contains('hidden')) {
+      gameOverModal.classList.add('hidden');
+    } else {
+      resetPuzzle();      // Instead, switch this to 'are you sure' modal
+    }
+  };
+
   if (e.key === 'Backspace' || e.key === 'Delete') {
     resetKeyboardCycleState();
     undoHandler();
@@ -143,7 +153,7 @@ function handleKeyPress(e) {
 
     if (currentRaised) {
       moveCardToGuessArea(currentRaised);
-    } else {
+    } else if (!submitButton.disabled) {
       submitWord();
     }
     return;
@@ -228,6 +238,8 @@ function moveCardToGuessArea(topCard) {
   moveHistory.push(move);
 
   setAllButtonStates();
+  updateWordGuessWrapperLayout();
+
 }
 
 function handleWordGuessCardClick(e) {
@@ -285,6 +297,7 @@ function undoLastLetterPlaced() {
   }
 
   setAllButtonStates();
+  updateWordGuessWrapperLayout();
 }
 
 function submitWord() {
@@ -317,6 +330,7 @@ function submitWord() {
     // if the word is incorrect, remove from the word guess area
     clearGuess();
     setAllButtonStates();
+    updateWordGuessWrapperLayout();
     return;
   }
 
@@ -349,7 +363,7 @@ function submitWord() {
 
   // update scoreboard
   updateScoreAndWordSubmissionCount();
-
+  updateWordGuessWrapperLayout();
   setAllButtonStates();
 
   if (gameIsOver()) {
@@ -378,6 +392,7 @@ function unSubmitWord() {
 
 
   setAllButtonStates();
+  updateWordGuessWrapperLayout();
   updateScoreAndWordSubmissionCount();
 }
 
@@ -396,6 +411,7 @@ function undoHandler() {
 
   // Step 3: Update UI
   setAllButtonStates();
+  updateWordGuessWrapperLayout();
   updateScoreAndWordSubmissionCount();
 
 }
@@ -412,11 +428,12 @@ function resetPuzzle() {
   clearGuess();
 
   // Then, keep undoing submitted words until none remain
-  while (submittedWordsHistory.length > 0) {
+  while (submittedWordsHistory.length > 0 || moveHistory.length > 0) {
     undoHandler();
   }
 
   setAllButtonStates();
+  updateWordGuessWrapperLayout();
 
   // Also clear any messages, if desired
   // displayMessage("Puzzle reset.", 'success');
@@ -559,10 +576,22 @@ function setAllButtonStates() {
   if (moveHistory.length < 2 || moveHistory.length > 15) {
     submitButton.disabled = true;
   } else submitButton.disabled = false;
-
-
-
 }
+
+function updateWordGuessWrapperLayout() {
+  const isOverflowing = wordGuessWrapper.scrollWidth > wordGuessWrapper.clientWidth;
+
+  if (isOverflowing) {
+    wordGuessWrapper.classList.add('scroll-mode');
+    wordGuessWrapper.scrollLeft = wordGuessWrapper.scrollWidth;
+  } else {
+    wordGuessWrapper.classList.remove('scroll-mode');
+    wordGuessWrapper.scrollLeft = 0;
+  }
+}
+
+
+
 
 // === GAME OVER MODAL ===
 
