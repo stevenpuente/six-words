@@ -204,6 +204,8 @@ function handleBoardClick(e) {
 }
 
 function moveCardToGuessArea(topCard) {
+  if (gameIsOver()) return;
+
   topCard.classList.remove('raised');
   const cell = topCard.parentElement;
   const bottomCard = cell.querySelector('.card.bottom');
@@ -368,6 +370,7 @@ function submitWord() {
 
   if (gameIsOver()) {
     showGameOverModal();
+    greyOutCards();
   }
 }
 
@@ -413,7 +416,7 @@ function undoHandler() {
   setAllButtonStates();
   updateWordGuessWrapperLayout();
   updateScoreAndWordSubmissionCount();
-
+  unGreyOutCards();
 }
 
 function clearGuess() {
@@ -434,6 +437,7 @@ function resetPuzzle() {
 
   setAllButtonStates();
   updateWordGuessWrapperLayout();
+  unGreyOutCards();
 
   // Also clear any messages, if desired
   // displayMessage("Puzzle reset.", 'success');
@@ -536,6 +540,24 @@ function generateAllPossibleWords(gameboardLetters, n) {
 
 
 // === HELPER FUNCTIONS === 
+function greyOutCards() {
+  const leftOverGreenCards = document.querySelectorAll('#game-board .cell .card.green');
+  const leftOverBlueCards = document.querySelectorAll('#game-board .cell .card.blue');
+
+  for (let card of leftOverGreenCards) card.classList.add('game-over');
+  for (let card of leftOverBlueCards) card.classList.add('game-over');
+}
+
+function unGreyOutCards() {
+  const leftOverCards = document.querySelectorAll('#game-board .cell .card.game-over');
+  if (leftOverCards.length) {
+    for (let card of leftOverCards) {
+      card.classList.remove('game-over')
+    }
+  }
+}
+
+
 function displayMessage(text, type = 'error', duration = 2500) {
   banner.textContent = text;
   banner.className = ''; // reset
