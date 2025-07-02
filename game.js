@@ -204,7 +204,7 @@ function handleBoardClick(e) {
 }
 
 function moveCardToGuessArea(topCard) {
-  if (gameIsOver()) return;
+  if(topCard.classList.contains('game-over')) return;
 
   topCard.classList.remove('raised');
   const cell = topCard.parentElement;
