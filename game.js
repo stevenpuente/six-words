@@ -2,8 +2,17 @@
 const gameBoard = [];
 const moveHistory = [];
 const submittedWordsHistory = [];
+
 let score = 0;
 let isModalOpen = true;
+
+const textDate = new Date().toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+
+const textPuzzleNumber = '777';     //Enter formula for date since puzzle begins here
 
 const keyboardCycleState = {
   currentKey: null,
@@ -34,6 +43,10 @@ const gameOverModalShareButton = document.getElementById('share-button');
 const gameOverModalPlayAgainButton = document.getElementById('play-again-button');
 const playButton = document.getElementById('play-button');
 
+// WELCOME MODAL ELEMENTS
+const dateElement = document.getElementById('date');
+const puzzleNumberElement = document.getElementById('puzzle-number');
+
 
 // === INITIALIZATION === (this listener fires when dom content is loaded, effectively kicking off the game)
 document.addEventListener('DOMContentLoaded', async () => {
@@ -55,6 +68,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     setVH();
     addCardsAndGrid();          // Adds cards to the DOM
     initializeEventListeners(); // Adds listeners for clicks
+    updateWelcomeModal();
 
   } catch (error) {
     displayMessage('Failed to load word list. Please reload.', 'error', 5000);
@@ -574,6 +588,11 @@ function generateAllPossibleWords(gameboardLetters, n) {
 
 
 // === HELPER FUNCTIONS === 
+function updateWelcomeModal() {
+  dateElement.innerText = textDate;
+  puzzleNumberElement.innerText = `No. ${textPuzzleNumber}`;
+}
+
 function greyOutCards() {
   const leftOverGreenCards = document.querySelectorAll('#game-board .cell .card.green');
   const leftOverBlueCards = document.querySelectorAll('#game-board .cell .card.blue');
@@ -797,3 +816,4 @@ function shareResults() {
       });
   }
 }
+
