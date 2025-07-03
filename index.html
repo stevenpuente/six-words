@@ -36,7 +36,7 @@
                 <div id="scoreboard-counters">
                     <div id="scoreboard-counters-text">
                         <span id="score-counter-text">SCORE:</span>
-                        <span id="words-submitted-counter-text">WORDS USED:</span>
+                        <span id="words-submitted-counter-text">WORDS:</span>
                     </div>
                     <div id="scoreboard-counters-nums">
                         <span id="score-counter-nums">0</span>
@@ -47,6 +47,26 @@
             </div>
         </div>
     </div>
+
+    <!-- LOAD SCREEN MODAL -->
+    <div id="welcome-modal-wrapper" class="">
+        <div id="welcome-modal">
+            <div id="logo">
+                <div class="cell">
+                    <div class="card top green"><span></span></div>
+                    <div class="card bottom blue"><span></span></div>
+                </div>
+            </div>
+            <h2>Six Words</h2>
+            <h3>Clear the board<br>in 6 words or less</h3>
+            <button id="play-button">Play</button>
+            <div id="welcome-modal-sub-text">
+                <p id="date">January 1, 2035</p>
+                <p>No. 777</p>
+            </div>
+        </div>
+    </div>
+
 
     <!-- GAME OVER MODAL -->
     <div id="game-over-modal" class="hidden">
@@ -75,21 +95,29 @@
         </div>
     </div>
 
-    <!-- LOAD SCREEN MODAL -->
-    <div id="welcome-modal-wrapper" class="">
-        <div id="welcome-modal">
-            <div id="logo">
+
+    <!-- ALERT MODAL -->
+    <div id="alert-modal" class="hidden">
+        <div class="alert-modal-content">
+            <button id="alert-modal-close-button">
+                <span class="alert-modal-close-text">Back to puzzle</span>
+                <svg class="alert-modal-close-icon" viewbox="0 0 24 24">
+                    <line x1="4" y1="4" x2="20" y2="20" />
+                    <line x1="20" y1="4" x2="4" y2="20" />
+                </svg>
+            </button>
+            <div id="alert-modal-logo">
                 <div class="cell">
                     <div class="card top green"><span></span></div>
                     <div class="card bottom blue"><span></span></div>
                 </div>
             </div>
-            <h2>Six Words</h2>
-            <h3>Clear the board in six words or less</h3>
-            <button id="play-button">Play</button>
-            <div id="welcome-modal-sub-text">
-                <p id="date">January 1, 2035</p>
-                <p>No. 777</p>
+            <h2 id="alert-modal-title">Are You Sure?</h2>
+            <h3 id="alert-modal-sub-title">Confirm if you would like to reset</h3>
+            <p id="alert-modal-text">You currently 30 points in 5 words</p>
+            <div class="alert-modal-buttons">
+                <button id="alert-modal-left-button">Cancel</button>
+                <button id="alert-modal-right-button">Reset</button>
             </div>
         </div>
     </div>

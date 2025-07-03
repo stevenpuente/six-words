@@ -109,21 +109,26 @@ h1 {
 }
 
 #message-banner {
-  height: 4rem;
-  z-index: 5;
-  top: 2rem;
-  position: absolute;
-  width: 100%;
-  padding: 1rem;
+  /* height: 4rem; */
+  /* top: 2rem; */
+  /* width: 100%; */
+  /* padding: 1rem; */
+  /* font-size: var(--message-banner-font-size); */
   text-align: center;
-  font-size: var(--message-banner-font-size);
+  position: absolute;
+  z-index: 5;
   font-weight: bold;
   border-radius: var(--default-wrapper-border-radius);
   background-color: var(--message-banner-error-color);
-  /* red by default */
   color: #f5f5f5;
   transition: opacity 0.3s ease;
+  font-size: clamp(.7rem, min(calc((16 / 844) * 100 * var(--vh)), calc((16 / 390) * 100vw)), 1.6rem);
+  height: clamp(1em, min(calc((40 / 844) * 100 * var(--vh)), calc((40 / 390) * 100vw)), 2.5em);
+  top: 1.5rem;
+  width: clamp(1em, min(calc((276 / 844) * 100 * var(--vh)), calc((276 / 390) * 100vw)), 12.5em);
+  padding: clamp(0rem, min(calc((10 / 844) * 100 * var(--vh)), calc((10 / 390) * 100vw)), 1rem);
 }
+
 
 #message-banner.hidden {
   display: none;
@@ -773,4 +778,141 @@ h3 {
     --text-color-accent: #2c2c2c;
     --text-color-primary: #f5f5f5;
   }
+}
+
+
+
+/* Alert Modal Styles */
+#alert-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(20, 20, 20, .85);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  z-index: 1000;
+}
+
+#alert-modal.hidden {
+  display: none;
+}
+
+
+.alert-modal-content {
+  background-color: var(--background-color-primary);
+  border-radius: var(--default-wrapper-border-radius);
+  padding: 2rem;
+  margin-top: 9.25rem;
+  width: 85%;
+  max-width: 35rem;
+  text-align: center;
+  font-family: var(--sans-serif-font-family);
+  position: relative;
+}
+
+#alert-modal-close-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: .75rem .75rem 2rem 2rem;
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  background: transparent;
+  border: none;
+  font-size: 1.2rem;
+  font-family: var(--sans-serif-font-family);
+  font-weight: 400;
+  color: var(--text-color-primary);
+}
+
+.alert-modal-close-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.alert-modal-close-icon line {
+  stroke: var(--text-color-primary);
+  stroke-width: 2;
+}
+
+
+#alert-modal h2 {
+  font-size: 3.5rem;
+  font-family: var(--serif-font-family);
+  margin: 1.5rem;
+  line-height: 1;
+}
+
+#alert-modal h3 {
+  font-size: 1.8rem;
+  font-family: var(--sans-serif-font-family);
+  margin: 0rem;
+  margin-top: -1rem;
+  margin-bottom: 3rem;
+  line-height: 1;
+  font-weight: 100;
+}
+
+#alert-modal #alert-modal-logo {
+  height: 100%;
+  width: 100%;
+  max-width: 6.5rem;
+  max-height: 6.5rem;
+  display: inline-grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
+  gap: .05em;
+}
+
+#alert-modal .cell {
+  aspect-ratio: 1/1;
+  width: 100%;
+  height: 100%;
+  /* border: .5px solid var(--thin-cell-border-color); */
+  background: var(--background-color-primary);
+  min-width: initial;
+  min-height: initial;
+}
+
+#alert-modal-modal .cell .card {
+  border-radius: var(--default-card-border-radius);
+}
+
+#alert-modal #alert-modal-text {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 2rem 0 1rem;
+}
+
+
+.alert-modal-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.alert-modal-buttons button {
+  font-size: 1.2rem;
+  padding: 0.75rem 2rem;
+  border: none;
+  border-radius: 6rem;
+  font-family: var(--sans-serif-font-family);
+  transition: background-color 0.3s ease;
+  height: 4rem;
+  width: 40%;
+  max-width: 12rem;
+  color: var(--text-color-primary);
+  border: 1px solid var(--text-color-primary);
+  background-color: var(--text-color-accent);
+}
+
+.alert-modal-buttons button:hover {
+  color: var(--text-color-accent);
+  background-color: var(--text-color-primary);
 }

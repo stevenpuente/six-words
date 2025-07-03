@@ -3,6 +3,7 @@ const gameBoard = [];
 const moveHistory = [];
 const submittedWordsHistory = [];
 let score = 0;
+let isModalOpen = true;
 
 const keyboardCycleState = {
   currentKey: null,
@@ -18,6 +19,13 @@ const resetButton = document.getElementById('reset-button');
 const scoreboard = document.getElementById('scoreboard');
 const gameBoardElement = document.getElementById('game-board');
 const welcomeModal = document.getElementById('welcome-modal-wrapper');
+
+// ALERT MODAL DOM ELEMENTS
+const alertModal = document.getElementById('alert-modal');
+const alertModalCloseButton = document.getElementById('alert-modal-close-button');
+const alertModalLeftButton = document.getElementById('alert-modal-left-button');
+const alertModalRightButton = document.getElementById('alert-modal-right-button');
+
 
 // MODAL DOM ELEMENTS
 const gameOverModal = document.getElementById('game-over-modal');
@@ -102,20 +110,41 @@ function initializeEventListeners() {
   window.addEventListener('resize', setVH);
 
   // Welcome Screen play button listener:
-  playButton.addEventListener('click', () => welcomeModal.classList.add('hidden'));
+  playButton.addEventListener('click', () => {
+    welcomeModal.classList.add('hidden');
+    isModalOpen = false;
+  } );
 
   // add event listener to game board
   gameBoardElement.addEventListener('click', handleBoardClick);
 
   // Game Over Modal Event Listeners:
   gameOverModalCloseButton.addEventListener('click', () => {
-    gameOverModal.classList.add('hidden')
+    gameOverModal.classList.add('hidden');
+    isModalOpen = false;
+
   });
   gameOverModalPlayAgainButton.addEventListener('click', () => {
     gameOverModal.classList.add('hidden');
+    isModalOpen = false;
     resetPuzzle();
   });
   gameOverModalShareButton.addEventListener('click', shareResults);
+
+  // Alert Modal Event Listeners:
+  alertModalCloseButton.addEventListener('click', () => {
+    alertModal.classList.add('hidden');
+    isModalOpen = false;
+  });
+  alertModalRightButton.addEventListener('click', () => {
+    alertModal.classList.add('hidden');
+    isModalOpen = false;
+    resetPuzzle();
+  });
+  alertModalLeftButton.addEventListener('click', () => {
+    isModalOpen = false;
+    alertModal.classList.add('hidden');
+  });
 
   // Prevent double tap to zoom
   document.addEventListener('dblclick', (e) => e.preventDefault())
@@ -123,23 +152,28 @@ function initializeEventListeners() {
   // add event listeners for clicking the undo, submit and reset buttons
   addBlurredClickListener(undoButton, undoHandler);
   addBlurredClickListener(submitButton, submitWord);
-  addBlurredClickListener(resetButton, resetPuzzle);
+  addBlurredClickListener(resetButton, showConfirmResetModal);
   wordGuessWrapper.addEventListener('click', handleWordGuessCardClick);
   document.addEventListener('keydown', handleKeyPress);
 }
 
 // === KEYBOARD MECHANICS === (event liseners for button presses)
 function handleKeyPress(e) {
-
   if (e.key === 'Escape') {
     if (!document.getElementById('welcome-modal-wrapper').classList.contains('hidden')) {
       document.getElementById('welcome-modal-wrapper').classList.add('hidden');
+      isModalOpen = false;
     } else if (!document.getElementById('game-over-modal').classList.contains('hidden')) {
       gameOverModal.classList.add('hidden');
+      isModalOpen = false;
+    } else if (!document.getElementById('alert-modal').classList.contains('hidden')) {
+      alertModal.classList.add('hidden');
     } else {
-      resetPuzzle();      // Instead, switch this to 'are you sure' modal
+      showConfirmResetModal();
     }
   };
+
+  if (isModalOpen) return;
 
   if (e.key === 'Backspace' || e.key === 'Delete') {
     resetKeyboardCycleState();
@@ -204,7 +238,8 @@ function handleBoardClick(e) {
 }
 
 function moveCardToGuessArea(topCard) {
-  if(topCard.classList.contains('game-over')) return;
+  if(isModalOpen) return;
+  if (topCard.classList.contains('game-over')) return;
 
   topCard.classList.remove('raised');
   const cell = topCard.parentElement;
@@ -328,7 +363,7 @@ function submitWord() {
 
   const validWords = window.VALID_WORDS_BY_LENGTH[word.length] || [];
   if (!validWords.includes(word)) {
-    displayMessage(`Not in the word list!`, 'error');
+    displayMessage(`Not in word list`, 'error');
     // if the word is incorrect, remove from the word guess area
     clearGuess();
     setAllButtonStates();
@@ -336,10 +371,8 @@ function submitWord() {
     return;
   }
 
-  if (word.length >= 3 && word.length <= 15) {
-    displayMessage(`Nice! + ${word.length} points`, 'success');
-  } else {
-    displayMessage(`Nice!`, 'success');
+  if (word.length >= 2 && word.length <= 15) {
+    displayMessage(`Nice! +${word.length} points`, 'success');
   }
 
   const scoreboardRow = document.createElement('div');
@@ -400,6 +433,7 @@ function unSubmitWord() {
 }
 
 function undoHandler() {
+
   const guessCards = document.querySelectorAll('#word-guess-wrapper .card');
   if (submittedWordsHistory.length === 0 && guessCards.length === 0) return;
 
@@ -615,9 +649,33 @@ function updateWordGuessWrapperLayout() {
 
 
 
+// === ALERT MODAL ===
+
+function showConfirmResetModal() {
+  isModalOpen = true;
+  const modal = document.getElementById('alert-modal');
+  const title = document.getElementById('alert-modal-title');
+  const subTitle = document.getElementById('alert-modal-sub-title');
+  const text = document.getElementById('alert-modal-text');
+
+  const score = calculateScore();
+  const wordsUsed = submittedWordsHistory.length;
+
+
+  title.textContent = 'Are You Sure?';
+  subTitle.textContent = `Confirm if you would like to reset`;
+  text.textContent = `You have ${score} points in ${wordsUsed} words`;
+
+  modal.classList.remove('hidden');
+}
+
+
+
+
 // === GAME OVER MODAL ===
 
 function showGameOverModal() {
+  isModalOpen = true;
   const modal = document.getElementById('game-over-modal');
   const title = document.getElementById('game-over-title');
   const subTitle = document.getElementById('game-over-sub-title');
@@ -630,14 +688,14 @@ function showGameOverModal() {
 
   // Title message
   if (score >= 32) {
-    title.textContent = `Perfect in ${wordsUsed}`;
+    title.textContent = `Perfect in ${wordsUsed}!`;
     subTitle.textContent = `You cleared the board in ${wordsUsed} words`;
   } else if (lettersLeft === 1) {
-    title.textContent = 'Game Over!';
-    subTitle.textContent = `You had 1 letter left!`;
+    title.textContent = 'Thanks for playing!';
+    subTitle.textContent = `You had 1 letter left.\nCan you clear the whole board?`;
   } else if (lettersLeft >= 1) {
-    title.textContent = 'Game Over!';
-    subTitle.textContent = `You had ${lettersLeft} letters left!`;
+    title.textContent = 'Thanks for playing!';
+    subTitle.textContent = `You had ${lettersLeft} letters left.\nCan you clear the whole board?`;
   }
 
 
@@ -649,7 +707,7 @@ function showGameOverModal() {
   //   subTitle.textContent = 'No Moves Left!';
   // }
 
-  stats.textContent = `Score: ${score} / 32 | Words used: ${wordsUsed} / 6`;
+  stats.textContent = `Score: ${score} / 32 | Words: ${wordsUsed} / 6`;
 
   wordList.innerHTML = '';
 
@@ -710,7 +768,7 @@ function createShareMessage() {
   const emojiLines = emojiArray.join('\n');
 
   const lines = [
-    `I scored ${score} points in ${numOfWordsUsed} words on today's puzzle!`,
+    `I scored ${score} points in ${numOfWordsUsed} words!`,
     emojiLines,
   ]
 
