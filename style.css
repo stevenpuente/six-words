@@ -167,7 +167,7 @@ h1 {
   cursor: pointer;
   aspect-ratio: 1/1;
   height: 100%;
-  font-size: var(--word-guess-wrapper-card-font-size);
+  font-size: clamp(.7rem, min(calc((26 / 844) * 100 * var(--vh)), calc((26 / 390) * 100vw)), 2.6rem);
 }
 
 #word-guess-wrapper .card span {
@@ -915,4 +915,32 @@ h3 {
 .alert-modal-buttons button:hover {
   color: var(--text-color-accent);
   background-color: var(--text-color-primary);
+}
+
+
+/* ANIMATIONS */
+
+@keyframes incorrect-shake {
+  0% {
+    transform: translateX(0px);
+  }
+  20% {
+    transform: translateX(-.15em);
+  }
+  40% {
+    transform: translateX(.15em);
+  }
+  60% {
+    transform: translateX(-.15em);
+  }
+  80% {
+    transform: translateX(.15em);
+  }
+  100% {
+    transform: translateX(0px);
+  }
+}
+
+.incorrect-shake {
+  animation: incorrect-shake .25s ease-in-out;
 }

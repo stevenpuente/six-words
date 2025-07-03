@@ -127,7 +127,7 @@ function initializeEventListeners() {
   playButton.addEventListener('click', () => {
     welcomeModal.classList.add('hidden');
     isModalOpen = false;
-  } );
+  });
 
   // add event listener to game board
   gameBoardElement.addEventListener('click', handleBoardClick);
@@ -252,7 +252,7 @@ function handleBoardClick(e) {
 }
 
 function moveCardToGuessArea(topCard) {
-  if(isModalOpen) return;
+  if (isModalOpen) return;
   if (topCard.classList.contains('game-over')) return;
 
   topCard.classList.remove('raised');
@@ -290,6 +290,7 @@ function moveCardToGuessArea(topCard) {
 
   setAllButtonStates();
   updateWordGuessWrapperLayout();
+  shakeIfTooManyWords();
 
 }
 
@@ -588,6 +589,12 @@ function generateAllPossibleWords(gameboardLetters, n) {
 
 
 // === HELPER FUNCTIONS === 
+async function incorrectShakeElement(el) {
+  el.classList.add('incorrect-shake');
+  await new Promise(resolve => setTimeout(resolve, 500));
+  el.classList.remove('incorrect-shake');
+}
+
 function updateWelcomeModal() {
   dateElement.innerText = textDate;
   puzzleNumberElement.innerText = `No. ${textPuzzleNumber}`;
@@ -817,3 +824,12 @@ function shareResults() {
   }
 }
 
+
+async function shakeIfTooManyWords() {
+  if (moveHistory.length > 15) {
+    const currentGuess = document.querySelectorAll('#word-guess-wrapper .card');
+    const lastLetter = currentGuess[currentGuess.length - 1];
+    await incorrectShakeElement(lastLetter);
+    undoLastLetterPlaced();
+  }
+}
