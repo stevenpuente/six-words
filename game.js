@@ -24,7 +24,7 @@ const banner = document.getElementById('message-banner');
 const wordGuessWrapper = document.getElementById('word-guess-wrapper');
 const undoButton = document.getElementById('undo-button');
 const submitButton = document.getElementById('submit-button');
-const resetButton = document.getElementById('reset-button');
+const restartButton = document.getElementById('restart-button');
 const scoreboard = document.getElementById('scoreboard');
 const gameBoardElement = document.getElementById('game-board');
 const welcomeModal = document.getElementById('welcome-modal-wrapper');
@@ -141,7 +141,7 @@ function initializeEventListeners() {
   gameOverModalPlayAgainButton.addEventListener('click', () => {
     gameOverModal.classList.add('hidden');
     isModalOpen = false;
-    resetPuzzle();
+    restartPuzzle();
   });
   gameOverModalShareButton.addEventListener('click', shareResults);
 
@@ -153,7 +153,7 @@ function initializeEventListeners() {
   alertModalRightButton.addEventListener('click', () => {
     alertModal.classList.add('hidden');
     isModalOpen = false;
-    resetPuzzle();
+    restartPuzzle();
   });
   alertModalLeftButton.addEventListener('click', () => {
     isModalOpen = false;
@@ -163,10 +163,10 @@ function initializeEventListeners() {
   // Prevent double tap to zoom
   document.addEventListener('dblclick', (e) => e.preventDefault())
 
-  // add event listeners for clicking the undo, submit and reset buttons
+  // add event listeners for clicking the undo, submit and restart buttons
   addBlurredClickListener(undoButton, undoHandler);
   addBlurredClickListener(submitButton, submitWord);
-  addBlurredClickListener(resetButton, showConfirmResetModal);
+  addBlurredClickListener(restartButton, showConfirmRestartModal);
   wordGuessWrapper.addEventListener('click', handleWordGuessCardClick);
   document.addEventListener('keydown', handleKeyPress);
 }
@@ -175,17 +175,33 @@ function initializeEventListeners() {
 function handleKeyPress(e) {
   if (e.key === 'Escape') {
     if (!document.getElementById('welcome-modal-wrapper').classList.contains('hidden')) {
-      document.getElementById('welcome-modal-wrapper').classList.add('hidden');
-      isModalOpen = false;
+      document.getElementById('play-button').click();
     } else if (!document.getElementById('game-over-modal').classList.contains('hidden')) {
-      gameOverModal.classList.add('hidden');
-      isModalOpen = false;
+      document.querySelector('#close-modal-button').click();
     } else if (!document.getElementById('alert-modal').classList.contains('hidden')) {
-      alertModal.classList.add('hidden');
+      document.querySelector('#alert-modal-close-button').click();
     } else {
-      showConfirmResetModal();
+      restartButton.click();
     }
   };
+
+  if (e.key === 'Enter' || e.key === 'Return') {
+    if (!document.querySelector('#alert-modal').classList.contains('hidden')) {
+      document.querySelector('#alert-modal-right-button').click();
+    } else if (!document.getElementById('welcome-modal-wrapper').classList.contains('hidden')) {
+      document.getElementById('play-button').click();
+    } else {
+      const currentRaised = document.querySelector('.raised');
+      resetKeyboardCycleState();
+
+      if (currentRaised) {
+        moveCardToGuessArea(currentRaised);
+      } else if (!submitButton.disabled) {
+        submitWord();
+      }
+      return;
+    }
+  }
 
   if (isModalOpen) return;
 
@@ -195,17 +211,7 @@ function handleKeyPress(e) {
     return;
   }
 
-  if (e.key === 'Enter' || e.key === 'Return') {
-    const currentRaised = document.querySelector('.raised');
-    resetKeyboardCycleState();
 
-    if (currentRaised) {
-      moveCardToGuessArea(currentRaised);
-    } else if (!submitButton.disabled) {
-      submitWord();
-    }
-    return;
-  }
 
   const key = e.key.toUpperCase();
   const currentTopCards = document.querySelectorAll('.cell .card.top, .cell .card.solo');
@@ -371,7 +377,7 @@ function submitWord() {
     return;
   }
 
-  if (word.length > 15) {
+  if (word.length > 16) {
     displayMessage("Too long", 'error');
     return;
   }
@@ -386,7 +392,7 @@ function submitWord() {
     return;
   }
 
-  if (word.length >= 2 && word.length <= 15) {
+  if (word.length >= 2 && word.length <= 16) {
     displayMessage(`Nice! +${word.length} points`, 'success');
   }
 
@@ -475,7 +481,7 @@ function clearGuess() {
   }
 }
 
-function resetPuzzle() {
+function restartPuzzle() {
   // First, clear any in-progress word
   clearGuess();
 
@@ -524,7 +530,7 @@ function gameIsOver() {
   // Step 3: Check if there are any possible moves left
   const gameBoardLettersToCheck = getCurrentGameBoard();
 
-  for (let i = 2; i <= 15; i++) {
+  for (let i = 2; i <= 16; i++) {
     const iLetterWords = generateAllPossibleWords(gameBoardLettersToCheck, i);
     for (let word of iLetterWords) {
       if (isValidWord(word)) {
@@ -647,15 +653,15 @@ function addBlurredClickListener(element, handler) {
 function setAllButtonStates() {
   // check if there are undo moves and set undo button
   if (moveHistory.length === 0 && submittedWordsHistory.length === 0) {
-    resetButton.disabled = true;
+    restartButton.disabled = true;
     undoButton.disabled = true;
   } else {
     undoButton.disabled = false;
-    resetButton.disabled = false;
+    restartButton.disabled = false;
   }
 
   // check if the current board is submittable
-  if (moveHistory.length < 2 || moveHistory.length > 15) {
+  if (moveHistory.length < 2 || moveHistory.length > 16) {
     submitButton.disabled = true;
   } else submitButton.disabled = false;
 }
@@ -677,20 +683,17 @@ function updateWordGuessWrapperLayout() {
 
 // === ALERT MODAL ===
 
-function showConfirmResetModal() {
+function showConfirmRestartModal() {
   isModalOpen = true;
   const modal = document.getElementById('alert-modal');
   const title = document.getElementById('alert-modal-title');
   const subTitle = document.getElementById('alert-modal-sub-title');
   const text = document.getElementById('alert-modal-text');
 
-  const score = calculateScore();
-  const wordsUsed = submittedWordsHistory.length;
-
-
-  title.textContent = 'Are You Sure?';
-  subTitle.textContent = `Confirm if you would like to reset`;
-  text.textContent = `You have ${score} points in ${wordsUsed} words`;
+  if (title) title.remove();
+  if (text) text.remove();
+  if (alertModalLeftButton) alertModalLeftButton.remove();
+  subTitle.textContent = `Are you sure you want to restart?`;
 
   modal.classList.remove('hidden');
 }
@@ -713,16 +716,18 @@ function showGameOverModal() {
   const wordsUsed = submittedWordsHistory.length;
 
   // Title message
-  if (score >= 32) {
+  if (lettersLeft >= 1) {
+    title.textContent = 'Game Over';
+    subTitle.textContent = `Play again to try for a perfect score!`;
+  } else if (score >= 32 && wordsUsed === 6) {
     title.textContent = `Perfect in ${wordsUsed}!`;
-    subTitle.textContent = `You cleared the board in ${wordsUsed} words`;
-  } else if (lettersLeft === 1) {
-    title.textContent = 'Thanks for playing!';
-    subTitle.textContent = `You had 1 letter left.\nCan you clear the whole board?`;
-  } else if (lettersLeft >= 1) {
-    title.textContent = 'Thanks for playing!';
-    subTitle.textContent = `You had ${lettersLeft} letters left.\nCan you clear the whole board?`;
+    subTitle.textContent = `Can you clear the board in 5?`;
+  } else if (score >= 32 && wordsUsed <= 5) {
+    title.textContent = `Perfect in ${wordsUsed}!`;
+    subTitle.textContent = `Well done! See you tomorrow.`;
   }
+
+
 
 
   // else if (wordsUsed >= 6) {
@@ -824,9 +829,8 @@ function shareResults() {
   }
 }
 
-
 async function shakeIfTooManyWords() {
-  if (moveHistory.length > 15) {
+  if (moveHistory.length > 16) {
     const currentGuess = document.querySelectorAll('#word-guess-wrapper .card');
     const lastLetter = currentGuess[currentGuess.length - 1];
     await incorrectShakeElement(lastLetter);
