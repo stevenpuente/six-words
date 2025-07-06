@@ -700,6 +700,62 @@ h3 {
 }
 
 
+/* Landscape Warning modal */
+
+#landscape-warning {
+  width: 100%;
+  height: 100%;
+  border-radius: var(--default-wrapper-border-radius);
+  background-color: var(--background-color-primary);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  position: fixed;
+  top: 0;
+}
+
+#landscape-warning.hidden {
+  display: none;
+}
+
+
+#landscape-warning #logo {
+  justify-items: center;
+  margin-bottom: 2rem;
+  height: 100%;
+  width: 100%;
+  max-width: 7rem;
+  max-height: 7rem;
+  display: inline-grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
+  gap: .05em;
+}
+
+#landscape-warning .cell {
+  aspect-ratio: 1/1;
+  width: 100%;
+  height: 100%;
+  /* border: .5px solid var(--thin-cell-border-color); */
+  background: var(--background-color-primary);
+  min-width: initial;
+  min-height: initial;
+}
+
+#landscape-warning .cell .card {
+  border-radius: v(--default-card-border-radius);
+}
+
+
+#landscape-warning p {
+  font-size: 3.6rem;
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  font-family: var(--serif-font-family);
+}
 
 
 

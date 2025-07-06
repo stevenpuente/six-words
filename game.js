@@ -160,6 +160,12 @@ function initializeEventListeners() {
     alertModal.classList.add('hidden');
   });
 
+  // Landscape warning Modal Event Listeners:
+  window.addEventListener('load', updateLandscapeWarningModal);
+  window.addEventListener('resize', updateLandscapeWarningModal);
+  window.addEventListener('orientationchange', updateLandscapeWarningModal);
+
+
   // Prevent double tap to zoom
   document.addEventListener('dblclick', (e) => e.preventDefault())
 
@@ -678,6 +684,21 @@ function updateWordGuessWrapperLayout() {
   }
 }
 
+// === LANDSCAPE WARNING MODAL ===
+
+function shouldShowWarning() {
+  const height = window.innerHeight;
+  const width = window.innerWidth;
+  const aspectRatio = width / height;
+
+  return (height<= 650 && aspectRatio > 1.8) || (height < 400 && aspectRatio > 1);
+}
+
+function updateLandscapeWarningModal() {
+  const landscapeWarningModal = document.getElementById('landscape-warning');
+
+  landscapeWarningModal.classList.toggle('hidden', !shouldShowWarning());
+}
 
 
 
@@ -697,8 +718,6 @@ function showConfirmRestartModal() {
 
   modal.classList.remove('hidden');
 }
-
-
 
 
 // === GAME OVER MODAL ===
@@ -726,17 +745,6 @@ function showGameOverModal() {
     title.textContent = `Perfect in ${wordsUsed}!`;
     subTitle.textContent = `Well done! See you tomorrow.`;
   }
-
-
-
-
-  // else if (wordsUsed >= 6) {
-  //   title.textContent = "Game Over!";
-  //   subTitle.textContent = 'You Used All Six Guesses!';
-  // } else {
-  //   title.textContent = "Game Over!";
-  //   subTitle.textContent = 'No Moves Left!';
-  // }
 
   stats.textContent = `Score: ${score} / 32 | Words: ${wordsUsed} / 6`;
 
