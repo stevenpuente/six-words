@@ -506,13 +506,13 @@ function restartPuzzle() {
 
 // === SCOREBOARD FUNCTIONS
 function updateScoreAndWordSubmissionCount() {
-  const scoreCounter = document.getElementById('score-counter-nums');
-  const wordSubmissionCounter = document.getElementById('words-submitted-counter-nums');
+  const scoreCounter = document.getElementById('score-counter-text');
+  const wordSubmissionCounter = document.getElementById('words-submitted-counter-text');
   const wordSubmissionCount = submittedWordsHistory.length;
   const score = calculateScore();
 
-  scoreCounter.textContent = score;
-  wordSubmissionCounter.textContent = `${wordSubmissionCount}/6`
+  scoreCounter.textContent = `Score: ${score}`;
+  wordSubmissionCounter.textContent = `Words: ${wordSubmissionCount}/6`
 }
 
 function calculateScore() {

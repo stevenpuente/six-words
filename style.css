@@ -355,7 +355,7 @@ h1 {
   flex-direction: column;
   gap: var(--gap-for-scoreboard-letters);
   border-radius: var(--default-wrapper-border-radius);
-  margin-top: -1.5rem;
+  margin-top: 1rem;
   height: 7.57142857143em;
   font-size: clamp(.6rem, min(calc((17.5 / 844) * 100 * var(--vh)), calc((17.5 / 390) * 100vw)), 1.75rem);
 }
