@@ -6,13 +6,19 @@ const submittedWordsHistory = [];
 let score = 0;
 let isModalOpen = true;
 
+// Date & Puzzle Number Logic
+const today = new Date();
+const puzzleStartDate = new Date('2025-07-14');
+const dayDiff = Math.floor((today - puzzleStartDate) / (1000 * 60 * 60 * 24));
+const textPuzzleNumber = (dayDiff + 1).toString();
+
+
 const textDate = new Date().toLocaleDateString('en-US', {
   year: 'numeric',
   month: 'long',
   day: 'numeric',
 });
 
-const textPuzzleNumber = '777';     //Enter formula for date since puzzle begins here
 
 const keyboardCycleState = {
   currentKey: null,
@@ -69,6 +75,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     addCardsAndGrid();          // Adds cards to the DOM
     initializeEventListeners(); // Adds listeners for clicks
     updateWelcomeModal();
+    updateFocusableElements();
 
   } catch (error) {
     displayMessage('Failed to load word list. Please reload.', 'error', 5000);
@@ -135,6 +142,7 @@ function initializeEventListeners() {
   // Game Over Modal Event Listeners:
   gameOverModalCloseButton.addEventListener('click', () => {
     gameOverModal.classList.add('hidden');
+    updateFocusableElements();
     isModalOpen = false;
 
   });
@@ -148,6 +156,7 @@ function initializeEventListeners() {
   // Alert Modal Event Listeners:
   alertModalCloseButton.addEventListener('click', () => {
     alertModal.classList.add('hidden');
+    updateFocusableElements();
     isModalOpen = false;
   });
   alertModalRightButton.addEventListener('click', () => {
@@ -157,6 +166,7 @@ function initializeEventListeners() {
   });
   alertModalLeftButton.addEventListener('click', () => {
     isModalOpen = false;
+    updateFocusableElements();
     alertModal.classList.add('hidden');
   });
 
@@ -182,20 +192,37 @@ function handleKeyPress(e) {
   if (e.key === 'Escape') {
     if (!document.getElementById('welcome-modal-wrapper').classList.contains('hidden')) {
       document.getElementById('play-button').click();
+      return;
     } else if (!document.getElementById('game-over-modal').classList.contains('hidden')) {
       document.querySelector('#close-modal-button').click();
+      return;
     } else if (!document.getElementById('alert-modal').classList.contains('hidden')) {
       document.querySelector('#alert-modal-close-button').click();
+      return;
     } else {
       restartButton.click();
+      return;
     }
   };
 
   if (e.key === 'Enter' || e.key === 'Return') {
     if (!document.querySelector('#alert-modal').classList.contains('hidden')) {
       document.querySelector('#alert-modal-right-button').click();
+      return;
     } else if (!document.getElementById('welcome-modal-wrapper').classList.contains('hidden')) {
       document.getElementById('play-button').click();
+      return;
+    } else if (document.activeElement && document.activeElement.matches('#button-wrapper button')) {
+      const activeButton = document.activeElement;
+      activeButton.click();
+      if (activeButton.matches('#button-wrapper #undo-button')) {
+        setTimeout(() => {
+          activeButton.focus();
+        }, 0);
+      }
+      return;
+    } else if (document.activeElement && document.activeElement.matches('.card[tabindex="0"]')) {
+      document.activeElement.click();
     } else {
       const currentRaised = document.querySelector('.raised');
       resetKeyboardCycleState();
@@ -261,6 +288,7 @@ function handleBoardClick(e) {
   if (wordGuessWrapper.contains(clickedCard)) return;
 
   moveCardToGuessArea(clickedCard); // now passes DOM element, not event
+  updateFocusableElements();
 }
 
 function moveCardToGuessArea(topCard) {
@@ -301,6 +329,7 @@ function moveCardToGuessArea(topCard) {
   moveHistory.push(move);
 
   setAllButtonStates();
+  updateFocusableElements();
   updateWordGuessWrapperLayout();
   shakeIfTooManyWords();
 
@@ -362,6 +391,7 @@ function undoLastLetterPlaced() {
 
   setAllButtonStates();
   updateWordGuessWrapperLayout();
+  updateFocusableElements();
 }
 
 function submitWord() {
@@ -394,6 +424,7 @@ function submitWord() {
     // if the word is incorrect, remove from the word guess area
     clearGuess();
     setAllButtonStates();
+    updateFocusableElements();
     updateWordGuessWrapperLayout();
     return;
   }
@@ -427,6 +458,7 @@ function submitWord() {
   updateScoreAndWordSubmissionCount();
   updateWordGuessWrapperLayout();
   setAllButtonStates();
+  updateFocusableElements();
 
   if (gameIsOver()) {
     showGameOverModal();
@@ -457,6 +489,7 @@ function unSubmitWord() {
   setAllButtonStates();
   updateWordGuessWrapperLayout();
   updateScoreAndWordSubmissionCount();
+  updateFocusableElements();
 }
 
 function undoHandler() {
@@ -478,6 +511,7 @@ function undoHandler() {
   updateWordGuessWrapperLayout();
   updateScoreAndWordSubmissionCount();
   unGreyOutCards();
+  updateFocusableElements();
 }
 
 function clearGuess() {
@@ -499,6 +533,7 @@ function restartPuzzle() {
   setAllButtonStates();
   updateWordGuessWrapperLayout();
   unGreyOutCards();
+  updateFocusableElements();
 
   // Also clear any messages, if desired
   // displayMessage("Puzzle reset.", 'success');
@@ -691,7 +726,7 @@ function shouldShowWarning() {
   const width = window.innerWidth;
   const aspectRatio = width / height;
 
-  return (height<= 650 && aspectRatio > 1.8) || (height < 400 && aspectRatio > 1);
+  return (height <= 650 && aspectRatio > 1.8) || (height < 400 && aspectRatio > 1);
 }
 
 function updateLandscapeWarningModal() {
@@ -807,6 +842,7 @@ function createShareMessage() {
   const emojiLines = emojiArray.join('\n');
 
   const lines = [
+    `Six Words #${textPuzzleNumber}`,
     `I scored ${score} points in ${numOfWordsUsed} words!`,
     emojiLines,
   ]
@@ -814,13 +850,32 @@ function createShareMessage() {
   return lines.join('\r\n').trim();
 }
 
+function createMobileShareMessage() {
+  const score = calculateScore();
+  const numOfWordsUsed = submittedWordsHistory.length;
+  const emojiArray = createEmojiArray();
+  const emojiLines = emojiArray.join('\n');
+
+  const lines = [
+    `I scored ${score} points in ${numOfWordsUsed} words!`,
+    emojiLines,
+  ]
+
+  return lines.join('\r\n').trim();
+}
+
+function isMobileDevice() {
+  return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+}
+
 function shareResults() {
   const message = createShareMessage();
+  const mobileMessage = createMobileShareMessage();
 
-  if (navigator.share) {
+  if (isMobileDevice() && navigator.share) {
     navigator.share({
-      title: 'Six Words #0',
-      text: message,
+      title: `Six Words #${textPuzzleNumber}`,
+      text: mobileMessage,
     }).then(() => {
       console.log("Shared successfully!");
     }).catch((err) => {
@@ -829,7 +884,7 @@ function shareResults() {
   } else {
     navigator.clipboard.writeText(message)
       .then(() => {
-        console.log("Results copied to clipboard.");
+        displayMessage('Copied to clipboard', 'success');
       })
       .catch((err) => {
         console.error("Failed to copy results to clipboard:", err);
@@ -843,5 +898,22 @@ async function shakeIfTooManyWords() {
     const lastLetter = currentGuess[currentGuess.length - 1];
     await incorrectShakeElement(lastLetter);
     undoLastLetterPlaced();
+  }
+}
+
+function updateFocusableElements() {
+  const topCards = document.querySelectorAll('#game-board .card.top, #game-board .card.solo');
+  const guessCards = document.querySelectorAll('#word-guess-wrapper .card');
+
+  const bottomCards = document.querySelectorAll('#game-board .card.bottom');
+  const submittedCards = document.querySelectorAll('#scoreboard .card');
+  const greyCards = document.querySelectorAll('#game-board .card.game-over')
+
+  for (let card of [...topCards, ...guessCards]) {
+    card.setAttribute('tabindex', '0');
+  }
+
+  for (let card of [...bottomCards, ...submittedCards, ...greyCards]) {
+    card.removeAttribute('tabindex')
   }
 }
