@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <script src="generateWords.js" defer></script>
+    <script src="validWords.js" defer></script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bevan:ital@0;1&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+
+    <title>Six Words</title>
+</head>
+
+<body>
+    <div id="main-container">
+        <h1><b>Six Words</b>
+        </h1>
+        <div id="main-card">
+            <div id="message-banner" class="hidden"></div>
+            <div id="word-guess-wrapper"></div>
+            <div id="game-board"></div>
+            <div id="button-wrapper">
+                <button id="undo-button" tabindex="0">Undo</button>
+                <button id="restart-button" tabindex="0">Restart</button>
+                <button id="submit-button" tabindex="0">Submit</button>
+            </div>
+            <div id="scoreboard-area-wrapper">
+                <div id="scoreboard-counters">
+                    <div id="scoreboard-counters-text">
+                        <span id="score-counter-text">Score: 0</span>
+                        <span id="words-submitted-counter-text">Words: 0/6</span>
+                    </div>
+                </div>
+                <div id="scoreboard"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- LOAD SCREEN MODAL -->
+    <div id="welcome-modal-wrapper" class="">
+        <div id="welcome-modal">
+            <div id="logo">
+                <div class="cell">
+                    <div class="card top green"><span></span></div>
+                    <div class="card bottom blue"><span></span></div>
+                </div>
+            </div>
+            <h2>Six Words</h2>
+            <h3>Clear the board<br>in 6 words or less</h3>
+            <button id="play-button">Play</button>
+            <div id="welcome-modal-sub-text">
+                <p id="date">January 1, 2035</p>
+                <p id="puzzle-number">No. 777</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- LANDSCAPE WARNING MODAL -->
+    <div id="landscape-warning" class="hidden">
+        <div id="logo">
+            <div class="cell">
+                <div class="card top green"><span></span></div>
+                <div class="card bottom blue"><span></span></div>
+            </div>
+        </div>
+        <p>Please rotate your device.
+        <p>
+    </div>
+
+    <!-- ALERT MODAL -->
+    <div id="alert-modal" class="hidden">
+        <div class="alert-modal-content">
+            <button id="alert-modal-close-button">
+                <svg class="alert-modal-close-icon" viewbox="0 0 24 24">
+                    <line x1="4" y1="4" x2="20" y2="20" />
+                    <line x1="20" y1="4" x2="4" y2="20" />
+                </svg>
+            </button>
+            <div id="alert-modal-logo">
+                <div class="cell">
+                    <div class="card top green"><span></span></div>
+                    <div class="card bottom blue"><span></span></div>
+                </div>
+            </div>
+            <h2 id="alert-modal-title">Are You Sure?</h2>
+            <h3 id="alert-modal-sub-title">Confirm if you would like to reset</h3>
+            <p id="alert-modal-text">You currently 30 points in 5 words</p>
+            <div class="alert-modal-buttons">
+                <button id="alert-modal-left-button">Cancel</button>
+                <button id="alert-modal-right-button">Restart</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- GAME OVER MODAL -->
+    <div id="game-over-modal" class="hidden">
+        <div class="modal-content">
+            <button id="close-modal-button">
+                <svg class="close-icon" viewbox="0 0 24 24">
+                    <line x1="4" y1="4" x2="20" y2="20" />
+                    <line x1="20" y1="4" x2="4" y2="20" />
+                </svg>
+            </button>
+            <div id="logo">
+                <div class="cell">
+                    <div class="card top green"><span></span></div>
+                    <div class="card bottom blue"><span></span></div>
+                </div>
+            </div>
+            <h2 id="game-over-title">Perfect!</h2>
+            <h3 id="game-over-sub-title">You Cleared The Board!</h3>
+            <p id="game-over-stats">Score: 30 / 32 | Words Submitted: 6 / 6</p>
+            <div id="game-over-summary-section"></div>
+            <div class="modal-buttons">
+                <button id="share-button">Share</button>
+                <button id="play-again-button">Play again</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="game.js" defer></script>
+</body>
+
+</html>
