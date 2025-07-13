@@ -1,12 +1,12 @@
-let GENERATE_WORDS_BY_LENGTH = {};
 
+export let generateWordsByLength = {};
 // PSUEDO RANDOM VARIABLES:
-const seed = getSeedFromDate(); 
-const rng = mulberry32(seed)
+const seed = getSeedFromDate();
+const rng = mulberry32(seed);
 
-async function generateWords() {
+export async function generateWords() {
   try {
-    const response = await fetch('generate_words_by_length.json');
+    const response = await fetch('/generate-words-by-length.json');
     if (!response.ok) throw new Error('Failed to load generation words');
 
     const wordData = await response.json();
@@ -16,56 +16,46 @@ async function generateWords() {
       wordData[length] = wordData[length].map(word => word.toUpperCase());
     }
 
-    GENERATE_WORDS_BY_LENGTH = wordData;
-    console.log("Generation words loaded:", GENERATE_WORDS_BY_LENGTH);
+    generateWordsByLength = wordData;
   } catch (error) {
     console.error("Error loading generation words:", error);
   }
 }
+// === HELPERS ===
 
-
-
-// LATEST ADDITIONS:
-
-
-// Helper: Pick a random word of given length
-function pickRandomWord(wordsByLength, length) {
+export function pickRandomWord(wordsByLength, length) {
   const list = wordsByLength[length];
   if (!list || list.length === 0) {
     throw new Error(`No words found of length ${length}`);
   }
   return list[Math.floor(rng() * list.length)].toUpperCase();
 }
-
-// Helper: Shuffle an array in place (Fisher-Yates)
-function shuffle(array) {
+export function shuffle(array) {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(rng() * (i + 1));
     [array[i], array[j]] = [array[j], array[i]];
   }
   return array;
 }
-
-// Main: Generate a random game board
-function generateRandomBoard() {
-  if (!GENERATE_WORDS_BY_LENGTH || Object.keys(GENERATE_WORDS_BY_LENGTH).length === 0) {
+export function generateRandomBoard() {
+  if (!generateWordsByLength || Object.keys(generateWordsByLength).length === 0) {
     throw new Error("Word list not loaded");
   }
 
   // Step 1: Pick 6 total words
   const blueWords = [
-    pickRandomWord(GENERATE_WORDS_BY_LENGTH, 5),
-    pickRandomWord(GENERATE_WORDS_BY_LENGTH, 5),
+    pickRandomWord(generateWordsByLength, 5),
+    pickRandomWord(generateWordsByLength, 5),
   ];
 
   const greenWords = [
-    pickRandomWord(GENERATE_WORDS_BY_LENGTH, 4),
-    pickRandomWord(GENERATE_WORDS_BY_LENGTH, 6),
+    pickRandomWord(generateWordsByLength, 4),
+    pickRandomWord(generateWordsByLength, 6),
   ];
 
   const splitWords = [
-    pickRandomWord(GENERATE_WORDS_BY_LENGTH, 7),
-    pickRandomWord(GENERATE_WORDS_BY_LENGTH, 5),
+    pickRandomWord(generateWordsByLength, 7),
+    pickRandomWord(generateWordsByLength, 5),
   ];
 
   // Step 2: Combine letters from split words and divide evenly
@@ -74,6 +64,7 @@ function generateRandomBoard() {
 
   const splitToBlue = combinedSplitLetters.slice(0, 6);
   const splitToGreen = combinedSplitLetters.slice(6); // remaining 6
+
 
   // Step 3: Build final letter arrays
   let blueLetters = [
@@ -111,9 +102,7 @@ function generateRandomBoard() {
     }
   };
 }
-
-
-function mulberry32(seed) {
+export function mulberry32(seed) {
   return function () {
     let t = seed += 0x6D2B79F5;
     t = Math.imul(t ^ (t >>> 15), t | 1);
@@ -121,11 +110,10 @@ function mulberry32(seed) {
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
 }
-
-function getSeedFromDate(date = new Date()) {
+export function getSeedFromDate(date = new Date()) {
   const year = date.getFullYear();
   const month = date.getMonth() + 1;
   const day = date.getDate();
 
-  return parseInt(`${year}${String(month).padStart(2, '0')}${String(day).padStart(2, '0')}`, 10)
+  return parseInt(`${year}${String(month).padStart(2, '0')}${String(day).padStart(2, '0')}`, 10);
 }

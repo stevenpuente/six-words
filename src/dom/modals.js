@@ -1,16 +1,55 @@
-import { textDate, textPuzzleNumber } from "./constants";
-import { getCurrentState } from "./game-state";
-import { alertModal, alertModalLeftButton, alertModalSubTitle, alertModalText, alertModalTitle, dateElement, gameOverModal, gameOverModalStats, gameOverModalSubTitle, gameOverModalSummarySection, gameOverModalTitle, getCardObjsFromCardIdArray, puzzleNumberElement, welcomeModelWrapper } from "./render-ui";
+import { modalTypes, textDate, textPuzzleNumber } from "../config";
+import { getCurrentState } from "../game-state/game-state";
+import { getCardObjsFromCardIdArray } from "../game-state/game-state-utils";
+import { dateElement, puzzleNumberElement, welcomeModelWrapper, alertModalTitle, alertModalText, alertModalLeftButton, alertModalSubTitle, alertModal, gameOverModalTitle, gameOverModalSubTitle, gameOverModalStats, gameOverModalSummarySection, gameOverModal } from "./dom-utils";
 
 
+// === GENERIC MODAL FUNCTIONS ===
+
+export const modalIdMap = {
+    [modalTypes.WELCOME]: 'welcome-modal-wrapper',
+    [modalTypes.LANDSCAPE_WARNING]: 'landscape-warning',
+    [modalTypes.GAME_OVER]: 'game-over-modal',
+    [modalTypes.CONFIRM_RESET]: 'alert-modal',
+    [modalTypes.INSTRUCTIONS]: 'instructions-modal',
+    [modalTypes.STATS]: 'stats-modal',
+};
+export function renderModal(currentState) {
+    Object.values(modalIdMap).forEach(modalId => {
+        const modalElement = document.getElementById(modalId);
+        if (modalElement) modalElement.classList.add('hidden');
+    });
+
+    if (currentState.modal.isOpen && currentState.modal.type && modalIdMap[currentState.modal.type]) {
+        switch (currentState.modal.type) {
+            case modalTypes.WELCOME: {
+                showWelcomeModal();
+                break;
+            }
+            case modalTypes.LANDSCAPE_WARNING: {
+                showLandscapeWarningModal();
+                break;
+            }
+            case modalTypes.CONFIRM_RESET: {
+                showConfirmRestartModal();
+                break;
+            }
+            case modalTypes.GAME_OVER: {
+                showGameOverModal();
+                break;
+            }
+        }
+    }
+}
 // === WELCOME MODAL ===
+
 export function showWelcomeModal() {
     dateElement.innerText = textDate;
     puzzleNumberElement.innerText = `No. ${textPuzzleNumber}`;
     welcomeModelWrapper.classList.remove('hidden');
 }
-
 // === RESTART CONFIRMATION MODAL ===
+
 export function showConfirmRestartModal() {
     if (alertModalTitle) alertModalTitle.remove();
     if (alertModalText) alertModalText.remove();
@@ -19,8 +58,8 @@ export function showConfirmRestartModal() {
 
     alertModal.classList.remove('hidden');
 }
-
 // === GAME OVER MODAL ===
+
 export function showGameOverModal() {
     const currentState = getCurrentState();
 
@@ -50,7 +89,6 @@ export function showGameOverModal() {
     }
     gameOverModal.classList.remove('hidden');
 }
-
 function createGameOverSummarySectionWord(arrayOfCardIds) {
     const cardObjsArray = getCardObjsFromCardIdArray(arrayOfCardIds);
 
@@ -74,13 +112,12 @@ function createGameOverSummarySectionWord(arrayOfCardIds) {
     }
     return summaryWord;
 }
-
 function createEmojiArray() {
     const finalWordsAsWordObjs = getCurrentState().submittedWordsCardIds;
     const emojiArray = [];
 
     for (let wordObjs of finalWordsAsWordObjs) {
-        let emojiWord = ''
+        let emojiWord = '';
         for (let cardObj of wordObjs) {
             if (cardObj.stackIndex === 0) emojiWord += '🟩';
             if (cardObj.stackIndex === 1) emojiWord += '🟦';
@@ -89,7 +126,6 @@ function createEmojiArray() {
     }
     return emojiArray;
 }
-
 function createShareMessage() {
     const currentState = getCurrentState();
 
@@ -102,11 +138,10 @@ function createShareMessage() {
         `Six Words #${textPuzzleNumber}`,
         `I scored ${score} points in ${numOfWordsUsed} words!`,
         emojiLines,
-    ]
+    ];
 
     return lines.join('\r\n').trim();
 }
-
 function createMobileShareMessage() {
     const currentState = getCurrentState();
 
@@ -118,15 +153,13 @@ function createMobileShareMessage() {
     const lines = [
         `I scored ${score} points in ${numOfWordsUsed} words!`,
         emojiLines,
-    ]
+    ];
 
     return lines.join('\r\n').trim();
 }
-
 function isMobileDevice() {
     return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 }
-
 export function shareResults() {
     const message = createShareMessage();
     const mobileMessage = createMobileShareMessage();
@@ -150,14 +183,13 @@ export function shareResults() {
             });
     }
 }
-
 // === LANDSCAPE WARNING MODAL ===
+
 export function showLandscapeWarningModal() {
     const landscapeWarningModal = document.getElementById('landscape-warning');
 
     landscapeWarningModal.classList.toggle('hidden', !shouldShowWarning());
 }
-
 function shouldShowWarning() {
     const height = window.innerHeight;
     const width = window.innerWidth;
@@ -165,4 +197,3 @@ function shouldShowWarning() {
 
     return (height <= 650 && aspectRatio > 1.8) || (height < 400 && aspectRatio > 1);
 }
-

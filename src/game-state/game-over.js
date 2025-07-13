@@ -1,8 +1,9 @@
-import { maximumWordLength, minimumWordLength } from "./constants";
-import { wordIsValid } from "./valid-words";
+import { minimumWordLength, maximumWordLength } from "../config";
+import { wordIsValid } from "../word-gen-and-validation/valid-words";
 
 
 // === GAME OVER LOGIC ===
+
 export function isGameOver(submittedWords, score, cards) {
   // Step 0: the game will not be over after the first turn
   if (submittedWords.length < 2) return false;
@@ -26,7 +27,6 @@ export function isGameOver(submittedWords, score, cards) {
   }
   return true;
 }
-
 export function getCurrentCardStacks(cards) {
   // Figure out how many cells in the grid there are:
   const maxCellIndex = Math.max(...cards.map(c => c.cellIndex));
@@ -40,13 +40,12 @@ export function getCurrentCardStacks(cards) {
       .filter(c => c.cellIndex === i && c.cardStatus !== 'submitted')
       .sort((a, b) => a.stackIndex - b.stackIndex);
 
-    const lettersStacksinCurrentCell = cardsInCurrentCell.map(c => c.letter)
+    const lettersStacksinCurrentCell = cardsInCurrentCell.map(c => c.letter);
     if (lettersStacksinCurrentCell.length > 0) currentStacksOnBoard.push(lettersStacksinCurrentCell);
   }
 
   return currentStacksOnBoard;
 }
-
 export function generateAllPossibleWords(gameboardLetters, wordLength) {
   const results = [];
 
@@ -70,4 +69,3 @@ export function generateAllPossibleWords(gameboardLetters, wordLength) {
 
   return results;
 }
-

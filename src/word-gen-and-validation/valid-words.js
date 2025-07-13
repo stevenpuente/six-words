@@ -1,9 +1,10 @@
-window.VALID_WORDS_BY_LENGTH = {};
-window.WORDS_LOADED = false;
 
-async function loadWords() {
+export let validWordsByLength = {};
+let wordsLoaded = false;
+
+export async function loadWords() {
   try {
-    const response = await fetch('valid_words_by_length.json');
+    const response = await fetch('/valid-words-by-length.json');
     if (!response.ok) throw new Error('Failed to load word list');
 
     const wordData = await response.json();
@@ -13,10 +14,13 @@ async function loadWords() {
       wordData[length] = wordData[length].map(word => word.toUpperCase());
     }
 
-    window.VALID_WORDS_BY_LENGTH = wordData;
-    window.WORDS_LOADED = true;
-    console.log('Words loaded:', window.VALID_WORDS_BY_LENGTH);
+    validWordsByLength = wordData;
+    wordsLoaded = true;
   } catch (error) {
     console.error('Error loading words:', error);
   }
+}
+export function wordIsValid(word) {
+  const validWords = validWordsByLength[word.length] || [];
+  return validWords.includes(word.toUpperCase());
 }

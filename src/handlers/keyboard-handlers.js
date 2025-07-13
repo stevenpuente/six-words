@@ -1,52 +1,17 @@
-import { modalTypes } from "./constants";
-import { dispatch, getCurrentState } from "./game-state";
-import { alertModalCloseButton, alertModalRightButton, gameBoardElement, gameOverModalCloseButton, gameOverModalPlayAgainButton, playButton, restartButton, submitButton, undoButton, wordGuessWrapper } from "./render-ui";
+import { playButton, alertModalCloseButton, gameOverModalCloseButton, restartButton, alertModalRightButton, gameOverModalPlayAgainButton, submitButton, undoButton } from "../dom/dom-utils";
+import { dispatch, getCurrentState } from "../game-state/game-state";
 
-// === CLICK HANDLERS === 
-export function handleBoardClick(e) {
-  const clickedCard = e.target.closest('.card.top, .card.solo');
-
-  // Ignore clicks outside cards or not on the board
-  if (!clickedCard || !gameBoardElement.contains(clickedCard)) return;
-
-  dispatch({ type: 'SELECT_CARD', payload: { id: clickedCard.dataset.cardId } })
-}
-
-export function handleWordGuessCardClick(e) {
-  const clickedCard = e.target.closest('.card');
-
-  // Ignore clicks not on cards
-  if (!clickedCard || !wordGuessWrapper.contains(clickedCard)) return;
-
-  dispatch({ type: 'UNDO_THROUGH_TAPPED_LETTER', payload: { id: clickedCard.dataset.cardId } })
-}
-
-// === BUTTON HANDLERS ===
-export function handleSubmitButton() {
-  const { currentWord } = getCurrentState();
-
-  dispatch({ type: 'SUBMIT_WORD', payload: { currentWord } })
-}
-
-export function handleUndoButton() {
-  dispatch({ type: 'UNDO' });
-}
-
-export function handleRestartButton() {
-  dispatch({ type: 'MODAL_OPEN', payload: { type: modalTypes.CONFIRM_RESET } });
-}
 
 // === KEYBOARD HANDLERS === 
+
 export const keyboardCycleState = {
   currentKey: null,
   currentIndex: 0,
 };
-
 export function resetKeyboardCycleState() {
   keyboardCycleState.currentKey = null;
   keyboardCycleState.currentIndex = 0;
 }
-
 export function getAvailableTopAndSoloCards(currentState) {
   // Filter out all cards except those that are available to play.
   const availableCards = currentState.cards.filter(c => c.cardStatus === 'AVAILABLE' || c.cardStatus === 'RAISED');
@@ -73,7 +38,6 @@ export function getAvailableTopAndSoloCards(currentState) {
 
   return availableTopAndSoloCards;
 }
-
 export function cycleMatchingCards(cards, key) {
   // Filter all the available top and solo cards and find ones that
   // match the key pressed
@@ -93,7 +57,6 @@ export function cycleMatchingCards(cards, key) {
   dispatch({ type: 'RAISE_CARD', payload: { id: matchingCards[index].id } });
   keyboardCycleState.currentIndex++;
 }
-
 export function handleEscKeyPress() {
   const currentState = getCurrentState();
   if (currentState.modal.isOpen && currentState.modal.type === 'WELCOME') playButton?.click();
@@ -101,7 +64,6 @@ export function handleEscKeyPress() {
   if (currentState.modal.isOpen && currentState.modal.type === 'GAME_OVER') gameOverModalCloseButton?.click();
   if (!currentState.modal.isOpen) restartButton?.click();
 }
-
 export function handleEnterKeyPress() {
   const currentState = getCurrentState();
 
@@ -158,15 +120,12 @@ export function handleEnterKeyPress() {
     submitButton?.click();
   }
 }
-
 export function handleDeleteKeyPress() {
   resetKeyboardCycleState();
   undoButton?.click();
 }
-
-
 export function handleKeyPress(e) {
-  if(!e.key) return;
+  if (!e.key) return;
   const currentState = getCurrentState();
 
   if (e.key === 'Escape') handleEscKeyPress();

@@ -1,8 +1,9 @@
-import { wordIsValid, } from './valid-words.js';
-import { getWordStringFromWordCardIds, calculateScore } from './reducer-helper-functions.js';
-import { isGameOver } from './game-over.js';
-import { renderUI } from './render-ui.js';
-import { modalTypes, minimumWordLength, maximumWordLength } from './constants.js';
+import { modalTypes, minimumWordLength, maximumWordLength } from "../config";
+import { isGameOver } from "./game-over";
+import { getWordStringFromWordCardIds, calculateScore } from "./game-state-utils";
+import { renderUI } from "../ui/render-ui";
+import { wordIsValid } from "../word-gen-and-validation/valid-words";
+
 
 // === CENTRALIZED STATE MANAGMENT ===
 const initialState = {
@@ -23,15 +24,13 @@ const initialState = {
     visible: false,
   },
 };
-
 let currentState = { ...initialState };
-
 // === DISPATCH AND REDUCER FUNCTIONS ===
+
 export function dispatch(action) {
   currentState = reducer(currentState, action);
   renderUI(currentState);
 }
-
 function reducer(state, action) {
   switch (action.type) {
 
@@ -41,7 +40,7 @@ function reducer(state, action) {
       return {
         ...initialState,
         cards: initialCards,
-      }
+      };
     }
 
     case 'RAISE_CARD': {
@@ -55,12 +54,12 @@ function reducer(state, action) {
           return {
             ...c,
             cardStatus: 'RAISED',
-          }
+          };
         } else if (c.cardStatus === 'RAISED') {
           return {
             ...c,
             cardStatus: 'AVAILABLE',
-          }
+          };
         } else {
           return c;
         }
@@ -79,8 +78,32 @@ function reducer(state, action) {
 
       const card = state.cards.find(c => c.id === action.payload.id);
       if (!card ||
-        !(card.cardStatus === 'AVAILABLE' || card.cardStatus === 'RAISED')
-      ) return state;
+        !(card.cardStatus === 'AVAILABLE' || card.cardStatus === 'RAISED')) return state;
+
+      if (state.currentWord.length >= 16) {
+        const updatedCurrentWord = [...state.currentWord, action.payload.id];
+        const updatedActionHistory = [...state.actionHistory, action];
+        const updatedCards = state.cards.map((c) => {
+          if (c.id === action.payload.id) {
+            return {
+              ...c,
+              cardStatus: 'SHAKE',
+            };
+          } else return c;
+        });
+
+        return {
+          ...state,
+          currentWord: updatedCurrentWord,
+          cards: updatedCards,
+          actionHistory: updatedActionHistory,
+          messageBanner: {
+            text: null,
+            type: null,
+            visible: false,
+          },
+        };
+      }
 
       if (state.currentWord.includes(action.payload.id)) return state;
 
@@ -91,9 +114,8 @@ function reducer(state, action) {
           return {
             ...c,
             cardStatus: 'SELECTED',
-          }
+          };
         } else return c;
-
       });
 
       return {
@@ -198,7 +220,7 @@ function reducer(state, action) {
         const updatedSubmittedWords = state.submittedWords.slice(0, -1);
         const updatedSubmittedWordsCardIds = state.submittedWordsCardIds.slice(0, -1);
         const updatedActionHistory = [...state.actionHistory, action];
-        const updatedScore = calculateScore(updatedSubmittedWordsCardIds)
+        const updatedScore = calculateScore(updatedSubmittedWordsCardIds);
         const updatedCards = state.cards.map((c) => {
           if (updatedCurrentWord.includes(c.id)) {
             return {
@@ -330,7 +352,7 @@ function reducer(state, action) {
           type: null,
           visible: false,
         },
-      }
+      };
 
     };
 
@@ -346,7 +368,7 @@ function reducer(state, action) {
           type: null,
           visible: false,
         },
-      }
+      };
     }
 
     case 'SHOW_BANNER': {
@@ -370,33 +392,31 @@ function reducer(state, action) {
       };
     }
 
-    default: return state
+    default: return state;
   }
 }
-
-
 // === HELPER FUNCTIONS===
 // Call this from main.js to initialize the game state from a board:
+
+
 export function initializeGame(board) {
   if (!board) throw new Error("Board must be provided to initialize the game.");
   dispatch({ type: 'INIT', payload: { board } });
 }
-
 // Call this function to return the current game state from anywhere:
+
 export function getCurrentState() {
   return currentState;
 }
-
 // This function is used whenever cards must be generated from
 // gameboard within the reducer. primarily to keep the code clean and readable
 function createCardsFromBoard(board) {
-  return board.flatMap((pair, cellIndex) =>
-    pair.map((letter, stackIndex) => ({
-      id: `cell-${cellIndex}_stack-${stackIndex}`,
-      letter,
-      cellIndex,
-      stackIndex,
-      cardStatus: 'AVAILABLE'
-    }))
+  return board.flatMap((pair, cellIndex) => pair.map((letter, stackIndex) => ({
+    id: `cell-${cellIndex}_stack-${stackIndex}`,
+    letter,
+    cellIndex,
+    stackIndex,
+    cardStatus: 'AVAILABLE'
+  }))
   );
 }

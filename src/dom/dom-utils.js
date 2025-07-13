@@ -1,6 +1,4 @@
-import { dispatch, getCurrentState } from './game-state.js';
-import { modalTypes } from './constants.js';
-import { showConfirmRestartModal, showGameOverModal, showLandscapeWarningModal, showWelcomeModal } from './modals.js';
+import { getCurrentState, dispatch } from "../game-state/game-state";
 
 // DOM Elements
 export const banner = document.getElementById('message-banner');
@@ -9,18 +7,14 @@ export const scoreboard = document.getElementById('scoreboard');
 export const gameBoardElement = document.getElementById('game-board');
 export const scoreCounter = document.getElementById('score-counter-text');
 export const wordsSubmittedCounter = document.getElementById('words-submitted-counter-text');
-
 // BUTTON ELEMENTS
 export const undoButton = document.getElementById('undo-button');
 export const submitButton = document.getElementById('submit-button');
 export const restartButton = document.getElementById('restart-button');
-
 // WELCOME MODAL ELEMENTS
 export const welcomeModelWrapper = document.getElementById('welcome-modal-wrapper');
 export const dateElement = document.getElementById('date');
 export const puzzleNumberElement = document.getElementById('puzzle-number');
-
-
 // ALERT MODAL DOM ELEMENTS
 export const alertModal = document.getElementById('alert-modal');
 export const alertModalTitle = document.getElementById('alert-modal-title');
@@ -29,8 +23,6 @@ export const alertModalText = document.getElementById('alert-modal-text');
 export const alertModalCloseButton = document.getElementById('alert-modal-close-button');
 export const alertModalLeftButton = document.getElementById('alert-modal-left-button');
 export const alertModalRightButton = document.getElementById('alert-modal-right-button');
-
-
 // GAME OVER MODAL DOM ELEMENTS
 export const gameOverModal = document.getElementById('game-over-modal');
 export const gameOverModalTitle = document.getElementById('game-over-title');
@@ -41,91 +33,18 @@ export const gameOverModalCloseButton = document.getElementById('close-modal-but
 export const gameOverModalShareButton = document.getElementById('share-button');
 export const gameOverModalPlayAgainButton = document.getElementById('play-again-button');
 export const playButton = document.getElementById('play-button');
+// DEBOUNCE
+export const currentlyShaking = new Set();
 
-
-
-export const modalIdMap = {
-    [modalTypes.WELCOME]: 'welcome-modal-wrapper',
-    [modalTypes.LANDSCAPE_WARNING]: 'landscape-warning',
-    [modalTypes.GAME_OVER]: 'game-over-modal',
-    [modalTypes.CONFIRM_RESET]: 'alert-modal',
-    [modalTypes.INSTRUCTIONS]: 'instructions-modal',
-    [modalTypes.STATS]: 'stats-modal',
-}
-
-
-export function renderUI() {
-    const currentState = getCurrentState();
-    clearAllCardsFromGame(currentState);
-
-    addCardsToGrid(currentState);
-    addCardsToWordBuilder(currentState);
-    addCardsToSubmittedWords(currentState);
-    updateScoreboardText(currentState);
-    raiseCards(currentState);
-    updateMessageUI(currentState);
-    renderModal(currentState);
-    updateWordGuessWrapperLayout(currentState);
-    greyOutController(currentState);
-
-    setAllButtonStates();
-    updateFocusableElements();
-}
-
-
-function renderModal(currentState) {
-    Object.values(modalIdMap).forEach(modalId => {
-        const modalElement = document.getElementById(modalId);
-        if (modalElement) modalElement.classList.add('hidden');
-    });
-
-    if (currentState.modal.isOpen && currentState.modal.type && modalIdMap[currentState.modal.type]) {
-        switch (currentState.modal.type) {
-            case modalTypes.WELCOME: {
-                showWelcomeModal();
-                break;
-            }
-            case modalTypes.LANDSCAPE_WARNING: {
-                showLandscapeWarningModal();
-                break;
-            }
-            case modalTypes.CONFIRM_RESET: {
-                showConfirmRestartModal();
-                break;
-            }
-            case modalTypes.GAME_OVER: {
-                showGameOverModal();
-                break;
-            }
-        }
-    }
-}
-
-function raiseCards(currentState) {
-    // remove any existing raised card:
-    const oldRaisedCards = document.querySelectorAll('.raised');
-    for (let card of oldRaisedCards) {
-        card.classList.remove('raised');
-    }
-
-    // read current state to find if there are any new raised cards and raise them
-    const raisedCardObj = currentState.cards.find(c => c.cardStatus === 'RAISED');
-    if (!raisedCardObj) return;
-
-    const raisedCardElement = document.querySelector(`[data-card-id="${raisedCardObj.id}"]`);
-    if (raisedCardElement) {
-        raisedCardElement.classList.add('raised');
-    }
-}
-
-function clearAllCardsFromGame(currentState) {
+// === CARD MANIPULATION IN DOM ====
+export function clearAllCardsFromGame(currentState) {
     // only run this if the last move was not a card raise:
     const lastAction = currentState.actionHistory.at(-1);
     if (lastAction?.type === 'RAISE_CARD') return;
 
     const allCards = document.querySelectorAll('#main-card .card');
     const allCells = document.querySelectorAll('#main-card .cell');
-    const scoreboardWordDivs = document.querySelectorAll('#scoreboard .scoreboard-word')
+    const scoreboardWordDivs = document.querySelectorAll('#scoreboard .scoreboard-word');
 
     for (let card of allCards) {
         card.remove();
@@ -139,13 +58,12 @@ function clearAllCardsFromGame(currentState) {
         el.remove();
     }
 }
-
-function addCardsToGrid(currentState) {
+export function addCardsToGrid(currentState) {
     // only run this if the last move was not a card raise:
     const lastAction = currentState.actionHistory.at(-1);
     if (lastAction?.type === 'RAISE_CARD') return;
 
-    const cardCellIndices = currentState.cards.map(c => c.cellIndex)
+    const cardCellIndices = currentState.cards.map(c => c.cellIndex);
     const maxCellIndex = cardCellIndices.length > 0 ? Math.max(...cardCellIndices) : -1;
     if (maxCellIndex === -1) {
         console.log('Problem Adding Cards to Grid');
@@ -155,7 +73,7 @@ function addCardsToGrid(currentState) {
     for (let i = 0; i <= maxCellIndex; i++) {
         const cell = document.createElement('div');
         cell.classList.add('cell');
-        gameBoardElement.appendChild(cell)
+        gameBoardElement.appendChild(cell);
     }
 
     const cells = document.querySelectorAll('#game-board .cell');
@@ -174,15 +92,14 @@ function addCardsToGrid(currentState) {
             if (availableCellCards.length === 1) {
                 card.classList.add('solo');
             } else if (availableCellCards.length > 1) {
-                card.classList.add(availableCard.stackIndex === 0 ? 'top' : 'bottom')
+                card.classList.add(availableCard.stackIndex === 0 ? 'top' : 'bottom');
             }
 
             cells[i].appendChild(card);
         }
     }
 }
-
-function addCardsToWordBuilder(currentState) {
+export function addCardsToWordBuilder(currentState) {
     // only run this if the last move was not a card raise:
     const lastAction = currentState.actionHistory.at(-1);
     if (lastAction?.type === 'RAISE_CARD') return;
@@ -197,8 +114,7 @@ function addCardsToWordBuilder(currentState) {
 
     // This will create a new array of arrays where each sub array is a letter and stack
     // index to determine color like: [A, 0] => letter A on a Green Card
-    const currentWordLetterAndStackIndex = currentWordCardObjs.map((cardObj) =>
-        ({ letter: cardObj.letter, stackIndex: cardObj.stackIndex, id: cardObj.id })
+    const currentWordLetterAndStackIndex = currentWordCardObjs.map((cardObj) => ({ letter: cardObj.letter, stackIndex: cardObj.stackIndex, id: cardObj.id })
     );
 
     // Loop over cards in current word to create elements in the word builder area
@@ -207,8 +123,7 @@ function addCardsToWordBuilder(currentState) {
         wordGuessWrapper.appendChild(cardElement);
     }
 }
-
-function addCardsToSubmittedWords(currentState) {
+export function addCardsToSubmittedWords(currentState) {
     // only run this if the last move was not a card raise:
     const lastAction = currentState.actionHistory.at(-1);
     if (lastAction?.type === 'RAISE_CARD') return;
@@ -247,15 +162,22 @@ function addCardsToSubmittedWords(currentState) {
         scoreboard.appendChild(scoreboardWordElement);
     }
 }
+export function raiseCards(currentState) {
+    // remove any existing raised card:
+    const oldRaisedCards = document.querySelectorAll('.raised');
+    for (let card of oldRaisedCards) {
+        card.classList.remove('raised');
+    }
 
-function updateScoreboardText(currentState) {
-    const { score, submittedWordsCardIds } = currentState;
-    const numWordsSubmitted = submittedWordsCardIds.length;
+    // read current state to find if there are any new raised cards and raise them
+    const raisedCardObj = currentState.cards.find(c => c.cardStatus === 'RAISED');
+    if (!raisedCardObj) return;
 
-    scoreCounter.textContent = `Score: ${score}`;
-    wordsSubmittedCounter.textContent = `Words: ${numWordsSubmitted}/6`
+    const raisedCardElement = document.querySelector(`[data-card-id="${raisedCardObj.id}"]`);
+    if (raisedCardElement) {
+        raisedCardElement.classList.add('raised');
+    }
 }
-
 function createCardElement(letter, stackIndex, id) {
     const card = document.createElement('div');
     card.classList.add('card');
@@ -269,27 +191,34 @@ function createCardElement(letter, stackIndex, id) {
         card.classList.add('blue');
     }
 
-    return card
+    return card;
 }
 
-function updateFocusableElements() {
+// === FUNCTIONS THAT UPDATE ===
+export function updateScoreboardText(currentState) {
+    const { score, submittedWordsCardIds } = currentState;
+    const numWordsSubmitted = submittedWordsCardIds.length;
+
+    scoreCounter.textContent = `Score: ${score}`;
+    wordsSubmittedCounter.textContent = `Words: ${numWordsSubmitted}/6`;
+}
+export function updateFocusableElements() {
     const topCards = document.querySelectorAll('#game-board .card.top, #game-board .card.solo');
     const guessCards = document.querySelectorAll('#word-guess-wrapper .card');
 
     const bottomCards = document.querySelectorAll('#game-board .card.bottom');
     const submittedCards = document.querySelectorAll('#scoreboard .card');
-    const greyCards = document.querySelectorAll('#game-board .card.game-over')
+    const greyCards = document.querySelectorAll('#game-board .card.game-over');
 
     for (let card of [...topCards, ...guessCards]) {
         card.setAttribute('tabindex', '0');
     }
 
     for (let card of [...bottomCards, ...submittedCards, ...greyCards]) {
-        card.removeAttribute('tabindex')
+        card.removeAttribute('tabindex');
     }
 }
-
-function setAllButtonStates() {
+export function setAllButtonStates() {
     const { submittedWordsCardIds, currentWord } = getCurrentState();
     // check if there are undo moves and set undo button
     if (currentWord.length === 0 && submittedWordsCardIds.length === 0) {
@@ -305,21 +234,10 @@ function setAllButtonStates() {
         submitButton.disabled = true;
     } else submitButton.disabled = false;
 }
-
-
 export function setVH() {
     const vh = window.innerHeight * 0.01;
     document.documentElement.style.setProperty('--vh', `${vh}px`);
 }
-
-function updateMessageUI(currentState) {
-    if (!currentState.messageBanner.visible || currentState.gameIsOver || currentState.modal.isOpen) {
-        banner.classList.add('hidden');
-        return;
-    }
-    displayMessage(currentState.messageBanner.text, currentState.messageBanner.type);
-}
-
 export function displayMessage(text, type = 'error', duration = 2500) {
     banner.textContent = text;
     banner.className = ''; // reset
@@ -327,7 +245,7 @@ export function displayMessage(text, type = 'error', duration = 2500) {
     banner.classList.remove('hidden');
 
     if (type === 'success') {
-        banner.classList.add('success') // green
+        banner.classList.add('success'); // green
     } else {
         banner.classList.add('error'); // red
     }
@@ -337,53 +255,7 @@ export function displayMessage(text, type = 'error', duration = 2500) {
         dispatch({ type: 'HIDE_BANNER' });
     }, duration);
 }
-
-// helper function to remove focus after button click:
-export function addBlurredClickListener(element, handler) {
-    element.addEventListener('click', (e) => {
-        e.currentTarget.blur();
-        handler(e);
-    });
-}
-
-// === HELPER FUNCTIONS === 
-async function incorrectShakeElement(el) {
-    el.classList.add('incorrect-shake');
-    await new Promise(resolve => setTimeout(resolve, 500));
-    el.classList.remove('incorrect-shake');
-}
-async function shakeIfTooManyWords() {
-    if (moveHistory.length > 16) {
-        const currentGuess = document.querySelectorAll('#word-guess-wrapper .card');
-        const lastLetter = currentGuess[currentGuess.length - 1];
-        await incorrectShakeElement(lastLetter);
-        undoLastLetterPlaced();
-    }
-}
-
-function greyOutController(currentState) {
-    if (currentState.gameIsOver) greyOutCards();
-    if (!currentState.gameIsOver) unGreyOutCards();
-}
-
-function greyOutCards() {
-    const leftOverGreenCards = document.querySelectorAll('#game-board .cell .card.green');
-    const leftOverBlueCards = document.querySelectorAll('#game-board .cell .card.blue');
-
-    for (let card of leftOverGreenCards) card.classList.add('game-over');
-    for (let card of leftOverBlueCards) card.classList.add('game-over');
-}
-
-function unGreyOutCards() {
-    const leftOverCards = document.querySelectorAll('#game-board .cell .card.game-over');
-    if (leftOverCards.length) {
-        for (let card of leftOverCards) {
-            card.classList.remove('game-over')
-        }
-    }
-}
-
-function updateWordGuessWrapperLayout(currentState) {
+export function updateWordGuessWrapperLayout(currentState) {
     const lastMove = currentState.actionHistory.at(-1);
     if (!lastMove || lastMove.type !== 'SELECT_CARD') return;
     const isOverflowing = wordGuessWrapper.scrollWidth > wordGuessWrapper.clientWidth;
@@ -396,13 +268,46 @@ function updateWordGuessWrapperLayout(currentState) {
         wordGuessWrapper.scrollLeft = 0;
     }
 }
+export function addBlurredClickListener(element, handler) {
+    element.addEventListener('click', (e) => {
+        e.currentTarget.blur();
+        handler(e);
+    });
+}
 
-// This is a good utility function that I imlemented late.
-export function getCardObjsFromCardIdArray(arrayOfCardIds) {
-    if (arrayOfCardIds.length === 0) return;
+// === VISUAL FEEDBACK ===
+export async function incorrectShakeElement(cardId) {
+    if (currentlyShaking.has(cardId)) return;
+    currentlyShaking.add(cardId);
 
-    // convert the array of card IDs that reperesent the word to an array
-    // of completed card objects.
-    const cardObjsArray = arrayOfCardIds.map(id => getCurrentState().cards.find(c => c.id === id));
-    return cardObjsArray;
+    const el = document.querySelector(`[data-card-id="${cardId}"]`);
+    el.classList.add('incorrect-shake');
+    await new Promise(resolve => setTimeout(resolve, 500));
+    el.classList.remove('incorrect-shake');
+    dispatch({ type: "UNDO" });
+
+    currentlyShaking.delete(cardId);
+}
+async function shakeIfTooManyWords() {
+    if (moveHistory.length > 16) {
+        const currentGuess = document.querySelectorAll('#word-guess-wrapper .card');
+        const lastLetter = currentGuess[currentGuess.length - 1];
+        await incorrectShakeElement(lastLetter);
+        undoLastLetterPlaced();
+    }
+}
+export function greyOutCards() {
+    const leftOverGreenCards = document.querySelectorAll('#game-board .cell .card.green');
+    const leftOverBlueCards = document.querySelectorAll('#game-board .cell .card.blue');
+
+    for (let card of leftOverGreenCards) card.classList.add('game-over');
+    for (let card of leftOverBlueCards) card.classList.add('game-over');
+}
+export function unGreyOutCards() {
+    const leftOverCards = document.querySelectorAll('#game-board .cell .card.game-over');
+    if (leftOverCards.length) {
+        for (let card of leftOverCards) {
+            card.classList.remove('game-over');
+        }
+    }
 }

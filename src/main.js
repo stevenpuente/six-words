@@ -1,13 +1,13 @@
 import './style.css';
-import { loadWords } from './valid-words.js';
-import { generateWords, generateRandomBoard } from './generate-words.js';
-import { initializeGame, dispatch, getCurrentState} from './game-state.js';
-import { displayMessage, setVH, playButton, gameBoardElement, gameOverModalCloseButton, gameOverModalPlayAgainButton, gameOverModalShareButton, alertModalCloseButton, alertModalRightButton, alertModalLeftButton, addBlurredClickListener, undoButton, submitButton, restartButton, wordGuessWrapper } from './render-ui.js';
-import { handleBoardClick, handleKeyPress, handleRestartButton, handleSubmitButton, handleUndoButton, handleWordGuessCardClick } from './handlers.js';
-import { shareResults, showLandscapeWarningModal } from './modals.js';
-
-
-window.getCurrentState = getCurrentState;
+import { loadWords } from "./word-gen-and-validation/valid-words.js";
+import { generateWords, generateRandomBoard } from "./word-gen-and-validation/gen-words.js";
+import { initializeGame, dispatch, getCurrentState } from "./game-state/game-state.js";
+import { displayMessage, setVH, addBlurredClickListener } from "./dom/dom-utils.js";
+import { playButton, gameBoardElement, gameOverModalCloseButton, gameOverModalPlayAgainButton, gameOverModalShareButton, alertModalCloseButton, alertModalRightButton, alertModalLeftButton, undoButton, submitButton, restartButton, wordGuessWrapper } from "./dom/dom-utils.js";
+import { handleKeyPress } from "./handlers/keyboard-handlers.js";
+import { handleRestartButton, handleSubmitButton, handleUndoButton } from "./handlers/button-handlers.js";
+import { handleBoardClick, handleWordGuessCardClick } from "./handlers/click-handlers.js";
+import { shareResults, showLandscapeWarningModal } from "./dom/modals.js";
 
 // === INITIALIZATION === (this listener fires when dom content is loaded, effectively kicking off the game)
 document.addEventListener('DOMContentLoaded', async () => {
