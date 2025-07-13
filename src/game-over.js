@@ -1,3 +1,7 @@
+import { maximumWordLength, minimumWordLength } from "./constants";
+import { wordIsValid } from "./valid-words";
+
+
 // === GAME OVER LOGIC ===
 export function isGameOver(submittedWords, score, cards) {
   // Step 0: the game will not be over after the first turn
@@ -66,3 +70,4 @@ export function generateAllPossibleWords(gameboardLetters, wordLength) {
 
   return results;
 }
+
