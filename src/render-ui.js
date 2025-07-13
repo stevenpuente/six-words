@@ -63,14 +63,13 @@ export function renderUI() {
     addCardsToSubmittedWords(currentState);
     updateScoreboardText(currentState);
     raiseCards(currentState);
-
-    renderModal(currentState);
-    updateFocusableElements();
-    setAllButtonStates();
-    updateWordGuessWrapperLayout(currentState);
     updateMessageUI(currentState);
-
+    renderModal(currentState);
+    updateWordGuessWrapperLayout(currentState);
     greyOutController(currentState);
+
+    setAllButtonStates();
+    updateFocusableElements();
 }
 
 
@@ -101,8 +100,6 @@ function renderModal(currentState) {
         }
     }
 }
-
-
 
 function raiseCards(currentState) {
     // remove any existing raised card:
@@ -185,7 +182,6 @@ function addCardsToGrid(currentState) {
     }
 }
 
-
 function addCardsToWordBuilder(currentState) {
     // only run this if the last move was not a card raise:
     const lastAction = currentState.actionHistory.at(-1);
@@ -260,7 +256,6 @@ function updateScoreboardText(currentState) {
     wordsSubmittedCounter.textContent = `Words: ${numWordsSubmitted}/6`
 }
 
-
 function createCardElement(letter, stackIndex, id) {
     const card = document.createElement('div');
     card.classList.add('card');
@@ -276,7 +271,6 @@ function createCardElement(letter, stackIndex, id) {
 
     return card
 }
-
 
 function updateFocusableElements() {
     const topCards = document.querySelectorAll('#game-board .card.top, #game-board .card.solo');
@@ -294,7 +288,6 @@ function updateFocusableElements() {
         card.removeAttribute('tabindex')
     }
 }
-
 
 function setAllButtonStates() {
     const { submittedWordsCardIds, currentWord } = getCurrentState();
@@ -314,8 +307,6 @@ function setAllButtonStates() {
 }
 
 
-
-
 export function setVH() {
     const vh = window.innerHeight * 0.01;
     document.documentElement.style.setProperty('--vh', `${vh}px`);
@@ -328,7 +319,6 @@ function updateMessageUI(currentState) {
     }
     displayMessage(currentState.messageBanner.text, currentState.messageBanner.type);
 }
-
 
 export function displayMessage(text, type = 'error', duration = 2500) {
     banner.textContent = text;
@@ -356,9 +346,6 @@ export function addBlurredClickListener(element, handler) {
     });
 }
 
-
-
-
 // === HELPER FUNCTIONS === 
 async function incorrectShakeElement(el) {
     el.classList.add('incorrect-shake');
@@ -374,6 +361,10 @@ async function shakeIfTooManyWords() {
     }
 }
 
+function greyOutController(currentState) {
+    if (currentState.gameIsOver) greyOutCards();
+    if (!currentState.gameIsOver) unGreyOutCards();
+}
 
 function greyOutCards() {
     const leftOverGreenCards = document.querySelectorAll('#game-board .cell .card.green');
@@ -406,9 +397,6 @@ function updateWordGuessWrapperLayout(currentState) {
     }
 }
 
-
-
-
 // This is a good utility function that I imlemented late.
 export function getCardObjsFromCardIdArray(arrayOfCardIds) {
     if (arrayOfCardIds.length === 0) return;
@@ -417,9 +405,4 @@ export function getCardObjsFromCardIdArray(arrayOfCardIds) {
     // of completed card objects.
     const cardObjsArray = arrayOfCardIds.map(id => getCurrentState().cards.find(c => c.id === id));
     return cardObjsArray;
-}
-
-function greyOutController(currentState) {
-    if (currentState.gameIsOver) greyOutCards();
-    if (!currentState.gameIsOver) unGreyOutCards();
 }
