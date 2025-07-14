@@ -9,6 +9,8 @@ import { handleRestartButton, handleSubmitButton, handleUndoButton } from "./han
 import { handleBoardClick, handleWordGuessCardClick } from "./handlers/click-handlers.js";
 import { shareResults, showLandscapeWarningModal } from "./dom/modals.js";
 
+window.getCurrentState = getCurrentState;
+
 // === INITIALIZATION === (this listener fires when dom content is loaded, effectively kicking off the game)
 document.addEventListener('DOMContentLoaded', async () => {
   try {
@@ -18,7 +20,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       generateWords()
     ]);
 
-    const { board } = generateRandomBoard();
+    const { board, wordsUsed} = generateRandomBoard();
+    console.log(wordsUsed);
     initializeGame(board);
     setVH();
     initializeEventListeners(); 

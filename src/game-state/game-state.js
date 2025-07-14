@@ -386,7 +386,8 @@ function reducer(state, action) {
       return {
         ...state,
         messageBanner: {
-          ...state.messageBanner,
+          text: null,
+          type: null,
           visible: false,
         }
       };

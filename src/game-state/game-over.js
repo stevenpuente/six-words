@@ -37,7 +37,7 @@ export function getCurrentCardStacks(cards) {
   // Itterate to find each of those cells and the stack contained within.
   for (let i = 0; i <= maxCellIndex; i++) {
     const cardsInCurrentCell = cards
-      .filter(c => c.cellIndex === i && c.cardStatus !== 'submitted')
+      .filter(c => c.cellIndex === i && c.cardStatus !== 'SUBMITTED')
       .sort((a, b) => a.stackIndex - b.stackIndex);
 
     const lettersStacksinCurrentCell = cardsInCurrentCell.map(c => c.letter);

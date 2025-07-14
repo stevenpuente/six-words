@@ -1,7 +1,7 @@
 import { modalTypes, textDate, textPuzzleNumber } from "../config";
-import { getCurrentState } from "../game-state/game-state";
+import { dispatch, getCurrentState } from "../game-state/game-state";
 import { getCardObjsFromCardIdArray } from "../game-state/game-state-utils";
-import { dateElement, puzzleNumberElement, welcomeModelWrapper, alertModalTitle, alertModalText, alertModalLeftButton, alertModalSubTitle, alertModal, gameOverModalTitle, gameOverModalSubTitle, gameOverModalStats, gameOverModalSummarySection, gameOverModal } from "./dom-utils";
+import { dateElement, puzzleNumberElement, welcomeModelWrapper, alertModalTitle, alertModalText, alertModalLeftButton, alertModalSubTitle, alertModal, gameOverModalTitle, gameOverModalSubTitle, gameOverModalStats, gameOverModalSummarySection, gameOverModal, displayMessage } from "./dom-utils";
 
 
 // === GENERIC MODAL FUNCTIONS ===
@@ -113,7 +113,14 @@ function createGameOverSummarySectionWord(arrayOfCardIds) {
     return summaryWord;
 }
 function createEmojiArray() {
-    const finalWordsAsWordObjs = getCurrentState().submittedWordsCardIds;
+    // fix this. this is expecting card ovjs, but only is getting word ids:
+    const currentState = getCurrentState();
+    const finalWordsAsWordObjs = currentState.submittedWordsCardIds.map((wordIdArray) => {
+        return wordIdArray.map((letterId) => {
+            return currentState.cards.find(c => c.id === letterId)
+        })
+    });
+
     const emojiArray = [];
 
     for (let wordObjs of finalWordsAsWordObjs) {
@@ -176,7 +183,8 @@ export function shareResults() {
     } else {
         navigator.clipboard.writeText(message)
             .then(() => {
-                displayMessage('Copied to clipboard', 'success');
+                // displayMessage('Copied to clipboard', 'success');
+                dispatch({ type: 'SHOW_BANNER', payload: { text: 'Copied to clipboard', type: 'success' } })
             })
             .catch((err) => {
                 console.error("Failed to copy results to clipboard:", err);
