@@ -655,6 +655,11 @@ h3 {
   border-radius: var(--default-card-border-radius);
 }
 
+#welcome-modal .cell .card.top:hover {
+  transform: scale(1) translate(-35%, -35%);
+}
+
+
 
 #welcome-modal h2 {
   font-size: 3.6rem;

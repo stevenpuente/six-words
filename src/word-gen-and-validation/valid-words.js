@@ -5,7 +5,7 @@ let wordsLoaded = false;
 
 export async function loadWords() {
   try {
-    const response = await fetch(base + 'valid-words-by-length.json');
+    const response = await fetch('/valid-words-by-length.json');
     if (!response.ok) throw new Error('Failed to load word list');
 
     const wordData = await response.json();

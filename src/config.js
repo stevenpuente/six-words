@@ -1,17 +1,27 @@
+import { getPacificDateString } from "./word-gen-and-validation/gen-words";
+
 // === CONSTANTS ===
 export const minimumWordLength = 2;
 export const maximumWordLength = 16;
 
 // Date & Puzzle Number Logic
-const today = new Date();
-const puzzleStartDate = new Date('2025-07-14');
-const dayDiff = Math.floor((today - puzzleStartDate) / (1000 * 60 * 60 * 24));
-export const textPuzzleNumber = (dayDiff + 1).toString();
-export const textDate = new Date().toLocaleDateString('en-US', {
+const puzzleStartDate = '2025-07-24';
+const [sy, sm, sd] = puzzleStartDate.split('-').map(Number);
+const startUTCms = Date.UTC(sy, sm - 1, sd);
+
+const [ty, tm, td] = getPacificDateString().split('-').map(Number);
+const todayUTCms = Date.UTC(ty, tm - 1, td);
+
+const msPerDay = 24 * 60 * 60 * 1000;
+const dayDiff = Math.floor((todayUTCms - startUTCms) / msPerDay);
+
+export const textPuzzleNumber = String(dayDiff + 1);
+export const textDate = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/Los_Angeles',
     year: 'numeric',
     month: 'long',
-    day: 'numeric',
-});
+    day: 'numeric'
+}).format(new Date());
 
 export const modalTypes = {
     WELCOME: 'WELCOME',

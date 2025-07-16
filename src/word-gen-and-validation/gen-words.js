@@ -2,12 +2,12 @@ const base = import.meta.env.BASE_URL;
 
 export let generateWordsByLength = {};
 // PSUEDO RANDOM VARIABLES:
-const seed = getSeedFromDate();
+const seed = parseInt(getPacificDateString().split('-').join(''));         // This needs to be in YYYYMMDD format
 const rng = mulberry32(seed);
 
 export async function generateWords() {
   try {
-    const response = await fetch(base + 'generate-words-by-length.json');
+    const response = await fetch('/generate-words-by-length.json');
     if (!response.ok) throw new Error('Failed to load generation words');
 
     const wordData = await response.json();
@@ -24,20 +24,6 @@ export async function generateWords() {
 }
 // === HELPERS ===
 
-export function pickRandomWord(wordsByLength, length) {
-  const list = wordsByLength[length];
-  if (!list || list.length === 0) {
-    throw new Error(`No words found of length ${length}`);
-  }
-  return list[Math.floor(rng() * list.length)].toUpperCase();
-}
-export function shuffle(array) {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(rng() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-  return array;
-}
 export function generateRandomBoard() {
   if (!generateWordsByLength || Object.keys(generateWordsByLength).length === 0) {
     throw new Error("Word list not loaded");
@@ -103,6 +89,20 @@ export function generateRandomBoard() {
     }
   };
 }
+export function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+export function pickRandomWord(wordsByLength, length) {
+  const list = wordsByLength[length];
+  if (!list || list.length === 0) {
+    throw new Error(`No words found of length ${length}`);
+  }
+  return list[Math.floor(rng() * list.length)].toUpperCase();
+}
 export function mulberry32(seed) {
   return function () {
     let t = seed += 0x6D2B79F5;
@@ -111,10 +111,33 @@ export function mulberry32(seed) {
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
 }
-export function getSeedFromDate(date = new Date()) {
-  const year = date.getFullYear();
-  const month = date.getMonth() + 1;
-  const day = date.getDate();
+export function getPacificDateString(date = new Date()) {
+    const parts = new Intl.DateTimeFormat('en-US', {
+        timeZone: 'America/Los_Angeles',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+    }).formatToParts(date);
 
-  return parseInt(`${year}${String(month).padStart(2, '0')}${String(day).padStart(2, '0')}`, 10);
+    const year = parts.find(p => p.type === 'year').value;
+    const month = parts.find(p => p.type === 'month').value;
+    const day = parts.find(p => p.type === 'day').value;
+
+    return `${year}-${month}-${day}`;
 }
+
+
+
+
+
+
+
+// Old getSeedFromDate:
+
+// function getSeedFromDate(date = new Date()) {
+//   const year = date.getFullYear();
+//   const month = date.getMonth() + 1;
+//   const day = date.getDate();
+
+//   return parseInt(`${year}${String(month).padStart(2, '0')}${String(day).padStart(2, '0')}`, 10);
+// }
