@@ -7,7 +7,7 @@ const rng = mulberry32(seed);
 
 export async function generateWords() {
   try {
-    const response = await fetch('/generate-words-by-length.json');
+    const response = await fetch(base + 'generate-words-by-length.json');
     if (!response.ok) throw new Error('Failed to load generation words');
 
     const wordData = await response.json();
