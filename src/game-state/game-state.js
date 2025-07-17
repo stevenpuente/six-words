@@ -3,10 +3,13 @@ import { isGameOver } from "./game-over";
 import { getWordStringFromWordCardIds, calculateScore } from "./game-state-utils";
 import { renderUI } from "../ui/render-ui";
 import { wordIsValid } from "../word-gen-and-validation/valid-words";
+import { getPacificDateString } from "../word-gen-and-validation/gen-words";
+import { saveGameState } from "./load-and-save";
 
 
 // === CENTRALIZED STATE MANAGMENT ===
 const initialState = {
+  puzzleDate: getPacificDateString(),
   cards: [],
   currentWord: [],
   submittedWords: [],
@@ -30,6 +33,7 @@ let currentState = { ...initialState };
 export function dispatch(action) {
   currentState = reducer(currentState, action);
   renderUI(currentState);
+  saveGameState();
 }
 function reducer(state, action) {
   switch (action.type) {
@@ -42,7 +46,20 @@ function reducer(state, action) {
         cards: initialCards,
       };
     }
-
+    case 'LOAD_SAVED_STATE': {
+      return {
+        ...action.payload,
+        modal: {
+          isOpen: false,
+          type: null,
+        },
+        messageBanner: {
+          text: null,
+          type: null,
+          visible: false,
+        },
+      };
+    }
     case 'RAISE_CARD': {
       const card = state.cards.find(c => c.id === action.payload.id);
       if (!card || card.cardStatus !== 'AVAILABLE') return state;
@@ -71,7 +88,6 @@ function reducer(state, action) {
         actionHistory: updatedActionHistory,
       };
     }
-
     case 'UNRAISE_CARD': {
       const card = state.cards.find(c => c.cardStatus === 'RAISED');
       if (!card || card.cardStatus !== 'RAISED') return state;
@@ -94,7 +110,6 @@ function reducer(state, action) {
         actionHistory: updatedActionHistory,
       };
     }
-
     case 'SELECT_CARD': {
       // first, check if game is over and bail if it is:
       if (state.gameIsOver) return state;
@@ -158,7 +173,6 @@ function reducer(state, action) {
         },
       };
     }
-
     case 'SUBMIT_WORD': {
       // first, check if game is over and bail if it is:
       if (state.gameIsOver) return state;
@@ -234,7 +248,6 @@ function reducer(state, action) {
           : state.modal,
       };
     }
-
     case 'UNDO': {
       // Case 0 where there are submitted words and no cards selected
       // Then we want to return current state because there is nothing to undo
@@ -307,7 +320,6 @@ function reducer(state, action) {
       // Fall Back in case somehow all of the above conditions fail
       return state;
     }
-
     case 'UNDO_THROUGH_TAPPED_LETTER': {
       // Action's payload will be an ID that is inside the current word. we want to undo up to and including that id. 
       if (state.currentWord.length === 0) return state;
@@ -334,7 +346,6 @@ function reducer(state, action) {
         actionHistory: updatedActionHistory,
       };
     }
-
     case 'RESTART': {
       // Block Restart if nothing to restart:
       if (state.submittedWordsCardIds.length === 0 && state.currentWord.length === 0) return state;
@@ -366,7 +377,6 @@ function reducer(state, action) {
         },
       };
     }
-
     case 'MODAL_OPEN': {
       console.log(action.payload.type);
       return {
@@ -398,7 +408,6 @@ function reducer(state, action) {
         },
       };
     }
-
     case 'SHOW_BANNER': {
       return {
         ...state,
@@ -409,7 +418,6 @@ function reducer(state, action) {
         }
       };
     }
-
     case 'HIDE_BANNER': {
       return {
         ...state,
@@ -420,7 +428,6 @@ function reducer(state, action) {
         }
       };
     }
-
     default: return state;
   }
 }

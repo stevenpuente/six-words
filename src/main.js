@@ -8,6 +8,7 @@ import { handleKeyPress } from "./handlers/keyboard-handlers.js";
 import { handleRestartButton, handleSubmitButton, handleUndoButton } from "./handlers/button-handlers.js";
 import { handleBoardClick, handleGlobalClickToUnraise, handleWordGuessCardClick } from "./handlers/click-handlers.js";
 import { shareResults, showLandscapeWarningModal } from "./dom/modals.js";
+import { loadSavedGameState } from './game-state/load-and-save.js';
 
 window.getCurrentState = getCurrentState;
 
@@ -20,9 +21,20 @@ document.addEventListener('DOMContentLoaded', async () => {
       generateWords()
     ]);
 
-    const { board, wordsUsed } = generateRandomBoard();
-    console.log(wordsUsed);
-    initializeGame(board);
+    // Load Saved Game Logic:
+    const savedGameState = loadSavedGameState();
+    if (savedGameState) {
+      // If there's a saved game, resume:
+      dispatch({type: 'LOAD_SAVED_STATE', payload: savedGameState});
+
+    } else {
+      // Start a Fresh Game
+      const { board, wordsUsed } = generateRandomBoard();
+      console.log(wordsUsed);
+      initializeGame(board);
+    }
+
+    // Rest of initialization logic after loading or initializing game:
     setVH();
     initializeEventListeners();
   } catch (error) {
