@@ -36,6 +36,9 @@ export function getAvailableTopAndSoloCards(currentState) {
     if (ithCellCardStack.length > 1) availableTopAndSoloCards.push(...ithCellCardStack.filter(c => c.stackIndex === 0));
   }
 
+  // below, this line prioritzies cards that are on top of the stack:
+  availableTopAndSoloCards.sort((a,b) => a.stackIndex - b.stackIndex);
+
   return availableTopAndSoloCards;
 }
 export function cycleMatchingCards(cards, key) {
@@ -62,6 +65,12 @@ export function handleEscKeyPress() {
   if (currentState.modal.isOpen && currentState.modal.type === 'WELCOME') playButton?.click();
   if (currentState.modal.isOpen && currentState.modal.type === 'GAME_RESET') alertModalCloseButton?.click();
   if (currentState.modal.isOpen && currentState.modal.type === 'GAME_OVER') gameOverModalCloseButton?.click();
+
+  if (currentState.cards.some(c=> c.cardStatus === 'RAISED')) {
+    dispatch({type:'UNRAISE_CARD'});
+    return;
+  }
+
   if (!currentState.modal.isOpen) restartButton?.click();
 }
 export function handleEnterKeyPress() {

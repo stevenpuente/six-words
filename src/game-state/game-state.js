@@ -72,6 +72,29 @@ function reducer(state, action) {
       };
     }
 
+    case 'UNRAISE_CARD': {
+      const card = state.cards.find(c => c.cardStatus === 'RAISED');
+      if (!card || card.cardStatus !== 'RAISED') return state;
+
+      const updatedActionHistory = [...state.actionHistory, action];
+      const updatedCards = state.cards.map((c) => {
+        if (c.cardStatus === 'RAISED') {
+          return {
+            ...c,
+            cardStatus: 'AVAILABLE',
+          };
+        } else {
+          return c;
+        }
+      });
+
+      return {
+        ...state,
+        cards: updatedCards,
+        actionHistory: updatedActionHistory,
+      };
+    }
+
     case 'SELECT_CARD': {
       // first, check if game is over and bail if it is:
       if (state.gameIsOver) return state;
@@ -115,7 +138,12 @@ function reducer(state, action) {
             ...c,
             cardStatus: 'SELECTED',
           };
-        } else return c;
+        } else if (c.id !== action.payload.id && c.cardStatus === 'RAISED') {
+          return {
+            ...c,
+            cardStatus: 'AVAILABLE',
+          };
+        } return c;
       });
 
       return {

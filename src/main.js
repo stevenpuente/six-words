@@ -6,7 +6,7 @@ import { displayMessage, setVH, addBlurredClickListener } from "./dom/dom-utils.
 import { playButton, gameBoardElement, gameOverModalCloseButton, gameOverModalPlayAgainButton, gameOverModalShareButton, alertModalCloseButton, alertModalRightButton, alertModalLeftButton, undoButton, submitButton, restartButton, wordGuessWrapper } from "./dom/dom-utils.js";
 import { handleKeyPress } from "./handlers/keyboard-handlers.js";
 import { handleRestartButton, handleSubmitButton, handleUndoButton } from "./handlers/button-handlers.js";
-import { handleBoardClick, handleWordGuessCardClick } from "./handlers/click-handlers.js";
+import { handleBoardClick, handleGlobalClickToUnraise, handleWordGuessCardClick } from "./handlers/click-handlers.js";
 import { shareResults, showLandscapeWarningModal } from "./dom/modals.js";
 
 window.getCurrentState = getCurrentState;
@@ -20,11 +20,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       generateWords()
     ]);
 
-    const { board, wordsUsed} = generateRandomBoard();
+    const { board, wordsUsed } = generateRandomBoard();
     console.log(wordsUsed);
     initializeGame(board);
     setVH();
-    initializeEventListeners(); 
+    initializeEventListeners();
   } catch (error) {
     displayMessage('Failed to load.', 'error', 5000);
     console.error(error);
@@ -74,6 +74,8 @@ function initializeEventListeners() {
   gameBoardElement.addEventListener('click', handleBoardClick);
   wordGuessWrapper.addEventListener('click', handleWordGuessCardClick);
   document.addEventListener('keydown', handleKeyPress);
+  // clicks on unclickable elements:
+  document.body.addEventListener('click', handleGlobalClickToUnraise)
   // buttons:
   addBlurredClickListener(undoButton, handleUndoButton);
   addBlurredClickListener(submitButton, handleSubmitButton);

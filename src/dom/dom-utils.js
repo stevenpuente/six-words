@@ -257,7 +257,7 @@ export function displayMessage(text, type = 'error', duration = 2500) {
 }
 export function updateWordGuessWrapperLayout(currentState) {
     const lastMove = currentState.actionHistory.at(-1);
-    if (!lastMove || lastMove.type !== 'SELECT_CARD') return;
+    // if (!lastMove || lastMove.type !== 'SELECT_CARD') return;
     const isOverflowing = wordGuessWrapper.scrollWidth > wordGuessWrapper.clientWidth;
 
     if (isOverflowing) {
